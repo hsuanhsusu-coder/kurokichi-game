@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>天玉街の黑吉 — 貓鼠遊戲</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+TC:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
+html,body{width:100%;height:100%;overflow:hidden;background:#050505;font-family:'Noto Sans TC',sans-serif;}
+#wrap{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;}
+
+/* ── HUD ── */
+#hud{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:6px 10px;pointer-events:none;z-index:20;}
+.hp{background:rgba(0,0,0,.78);border:2px solid #f0c040;border-radius:4px;padding:5px 10px;color:#f0c040;font:9px/1.9 'Press Start 2P',monospace;white-space:nowrap;}
+
+/* ── Touch Controls (always visible) ── */
+#tpad{position:fixed;bottom:12px;left:12px;z-index:30;width:140px;height:140px;}
+#tpad b{position:absolute;width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#f0c040;background:rgba(240,192,64,.18);border:2px solid rgba(240,192,64,.45);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+#tpad b:active,#tpad b.on{background:rgba(240,192,64,.55);}
+#tpad .u{top:0;left:48px}#tpad .d{bottom:0;left:48px}#tpad .l{top:48px;left:0}#tpad .r{top:48px;right:0}
+#tact{position:fixed;bottom:12px;right:12px;z-index:30;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+#tact b{width:56px;height:46px;border-radius:8px;display:flex;align-items:center;justify-content:center;font:8px/1 'Press Start 2P',monospace;color:#f0c040;background:rgba(240,192,64,.18);border:2px solid rgba(240,192,64,.45);cursor:pointer;-webkit-tap-highlight-color:transparent;text-align:center;padding:2px;}
+#tact b:active,#tact b.on{background:rgba(240,192,64,.55);}
+#tact b.cd{opacity:.35;pointer-events:none;}
+
+/* ── Overlays ── */
+#ov{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+#ov.hide{display:none;}
+#ov .bg{position:absolute;inset:0;background:rgba(5,5,5,.92);}
+#ov .ct{position:relative;z-index:1;text-align:center;color:#f0c040;font-family:'Press Start 2P',monospace;padding:20px;}
+#ov h1{font-size:20px;text-shadow:3px 3px 0 #8b0000;line-height:1.7;margin-bottom:4px;}
+#ov h2{font-size:12px;color:#ccc;line-height:1.7;margin-bottom:16px;}
+#ov p{font-size:8px;color:#999;line-height:2.2;}
+#ov canvas#eyeCanvas{margin:0 auto 16px;}
+.btn{display:inline-block;margin-top:18px;padding:14px 36px;background:#8b0000;color:#f0c040;border:3px solid #f0c040;font:14px 'Press Start 2P',monospace;cursor:pointer;border-radius:2px;-webkit-tap-highlight-color:transparent;}
+.btn:active{background:#f0c040;color:#0a0a0a;}
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="c"></canvas></div>
+
+<div id="hud"><div class="hp" id="h1"></div><div class="hp" id="h2"></div></div>
+
+<div id="tpad">
+  <b class="u" data-d="0">▲</b>
+  <b class="d" data-d="1">▼</b>
+  <b class="l" data-d="2">◀</b>
+  <b class="r" data-d="3">▶</b>
+</div>
+<div id="tact">
+  <b id="bHide" data-a="hide">隱身</b>
+  <b id="bSprint" data-a="sprint">衝刺</b>
+  <b id="bVault" data-a="vault">翻越</b>
+  <b id="bFur" data-a="fur">貓毛</b>
+</div>
+
+<div id="ov">
+  <div class="bg"></div>
+  <div class="ct" id="ovc"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  天玉街の黑吉  v2 — Touch-first + Smart AI
+// ═══════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const cv = $('c'), cx = cv.getContext('2d');
+
+// ── Sizing ──
+const T = 32, COLS = 25, ROWS = 19;
+const MW = COLS*T, MH = ROWS*T;
+let scale = 1, offX = 0, offY = 0;
+
+function resize() {
+  const vw = window.innerWidth, vh = window.innerHeight;
+  // leave room for controls at bottom
+  const usable = vh - 170;
+  scale = Math.min(vw / MW, Math.max(usable, vh*0.52) / MH);
+  scale = Math.max(scale, 0.35);
+  cv.style.width  = (MW*scale|0) + 'px';
+  cv.style.height = (MH*scale|0) + 'px';
+  cv.width = MW; cv.height = MH;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ── Tile types ──
+const P=0,W=1,F=2,C=3,X=4,S=5,L=6;
+
+// ── Map ──
+const MAP=[
+[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+[1,0,0,6,0,0,1,5,0,0,0,1,0,0,0,1,0,0,5,0,0,0,6,0,1],
+[1,0,1,1,1,0,1,0,1,1,0,1,0,1,0,1,0,1,1,1,0,1,1,0,1],
+[1,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,1],
+[1,1,1,0,1,2,1,1,0,1,1,1,0,1,1,1,0,1,0,1,0,1,1,1,1],
+[1,3,0,0,0,0,0,1,0,0,0,0,0,0,5,1,0,1,0,0,0,0,0,5,1],
+[1,0,1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,2,1,1,0,1],
+[1,0,0,0,6,1,0,0,0,0,0,6,0,1,0,0,0,0,0,0,0,0,1,0,1],
+[1,1,1,0,0,1,1,1,1,1,0,1,0,1,1,1,1,1,0,1,1,0,1,0,1],
+[1,5,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,1,6,0,0,0,1],
+[1,0,1,1,1,0,1,1,0,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1],
+[1,0,0,0,1,0,0,1,0,0,0,0,6,0,0,0,5,0,0,0,0,0,0,3,1],
+[1,1,1,0,1,1,0,1,1,1,2,1,1,1,0,1,1,1,0,1,1,1,1,0,1],
+[1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1,0,1],
+[1,0,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,0,1,0,1],
+[1,0,0,1,0,0,5,1,0,0,0,0,0,0,0,0,0,0,6,0,0,1,1,0,1],
+[1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,0,0,1],
+[1,0,0,0,0,0,0,0,0,0,3,1,0,0,5,0,0,0,0,0,0,0,0,4,1],
+[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+];
+function cloneMap(){return MAP.map(r=>[...r]);}
+
+// ── Audio ──
+let ac=null;
+function ia(){if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();}
+function tone(f,d,t='square',v=.07){
+  if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();
+  o.type=t;o.frequency.value=f;g.gain.value=v;
+  g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);
+  o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d);
+}
+const sfx={
+  step(){tone(110+Math.random()*30,.04,'triangle',.03)},
+  can(){tone(880,.07);tone(1100,.07);setTimeout(()=>tone(1320,.1),70)},
+  alert(){tone(600,.12,'sawtooth',.11);setTimeout(()=>tone(800,.12,'sawtooth',.11),120)},
+  fur(){tone(200,.25,'sawtooth',.06);tone(150,.18,'triangle',.04)},
+  vault(){tone(300,.05);tone(500,.07)},
+  over(){tone(400,.18,'sawtooth',.1);setTimeout(()=>tone(300,.18,'sawtooth',.1),180);setTimeout(()=>tone(200,.35,'sawtooth',.1),360)},
+  win(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.18,'square',.1),i*110))},
+  hear(){tone(250,.1,'triangle',.03)},
+};
+
+// ── State ──
+let gs='title',map,pl,ens,pts,cans,timer,afxs,shake,codec,codect;
+let disc,furCD,stam,mvt,lt=0;
+const TOTAL_TIME=90,FUR_CD=8000;
+
+// ── Input ──
+const inp={dir:-1,hide:false,sprint:false,vault:false,fur:false};
+const kd={};
+document.addEventListener('keydown',e=>{kd[e.code]=true;e.preventDefault();});
+document.addEventListener('keyup',e=>{kd[e.code]=false;});
+
+// Touch d-pad
+document.querySelectorAll('#tpad b').forEach(b=>{
+  const d=+b.dataset.d;
+  const on=e=>{e.preventDefault();ia();inp.dir=d;b.classList.add('on');};
+  const off=e=>{e.preventDefault();if(inp.dir===d)inp.dir=-1;b.classList.remove('on');};
+  b.addEventListener('touchstart',on);b.addEventListener('touchend',off);b.addEventListener('touchcancel',off);
+  b.addEventListener('mousedown',on);b.addEventListener('mouseup',off);b.addEventListener('mouseleave',off);
+});
+// Touch actions
+document.querySelectorAll('#tact b').forEach(b=>{
+  const a=b.dataset.a;
+  const on=e=>{e.preventDefault();ia();inp[a]=true;b.classList.add('on');};
+  const off=e=>{e.preventDefault();inp[a]=false;b.classList.remove('on');};
+  b.addEventListener('touchstart',on);b.addEventListener('touchend',off);b.addEventListener('touchcancel',off);
+  b.addEventListener('mousedown',on);b.addEventListener('mouseup',off);b.addEventListener('mouseleave',off);
+});
+
+// Keyboard → inp
+function syncKeys(){
+  if(kd.ArrowUp||kd.KeyW) inp.dir=0;
+  else if(kd.ArrowDown||kd.KeyS) inp.dir=1;
+  else if(kd.ArrowLeft||kd.KeyA) inp.dir=2;
+  else if(kd.ArrowRight||kd.KeyD) inp.dir=3;
+  else if(inp.dir>=0 && !document.querySelector('#tpad b.on')) inp.dir=-1;
+  inp.hide=inp.hide||!!kd.Space;
+  inp.sprint=inp.sprint||!!kd.ShiftLeft||!!kd.ShiftRight;
+  inp.vault=inp.vault||!!kd.KeyZ;
+  inp.fur=inp.fur||!!kd.KeyF;
+}
+
+// ── Pathfinding A* ──
+function astar(sx,sy,tx,ty,vault=false){
+  if(sx===tx&&sy===ty)return[];
+  const open=[{x:sx,y:sy,g:0,h:Math.abs(tx-sx)+Math.abs(ty-sy),p:null}];
+  const cl=new Set();const k=(x,y)=>y*COLS+x;
+  let iters=0;
+  while(open.length&&iters++<600){
+    open.sort((a,b)=>(a.g+a.h)-(b.g+b.h));
+    const c=open.shift();
+    if(c.x===tx&&c.y===ty){const p=[];let n=c;while(n.p){p.unshift({x:n.x,y:n.y});n=n.p;}return p;}
+    cl.add(k(c.x,c.y));
+    for(const[dx,dy]of[[0,-1],[0,1],[-1,0],[1,0]]){
+      const nx=c.x+dx,ny=c.y+dy;
+      if(nx<0||nx>=COLS||ny<0||ny>=ROWS)continue;
+      if(cl.has(k(nx,ny)))continue;
+      const t=map[ny][nx];
+      if(t===W)continue;
+      if(t===F&&!vault)continue;
+      const g=c.g+1;
+      const ex=open.find(n=>n.x===nx&&n.y===ny);
+      if(!ex)open.push({x:nx,y:ny,g,h:Math.abs(tx-nx)+Math.abs(ty-ny),p:c});
+      else if(g<ex.g){ex.g=g;ex.p=c;}
+    }
+  }
+  return null;
+}
+
+// ── Line of Sight ──
+function los(x1,y1,x2,y2){
+  const dx=x2-x1,dy=y2-y1,st=Math.max(Math.abs(dx),Math.abs(dy));
+  if(!st)return true;
+  for(let i=1;i<=st;i++){
+    const cx=Math.round(x1+dx*i/st),cy=Math.round(y1+dy*i/st);
+    if(cx<0||cx>=COLS||cy<0||cy>=ROWS)return false;
+    const t=map[cy][cx];if(t===W||t===F)return false;
+  }
+  return true;
+}
+
+// ── Vision Cone ──
+function visionCone(e){
+  const tiles=[];
+  const dirs=[[0,-1],[0,1],[-1,0],[1,0]];
+  const d=dirs[e.vd];
+  const perps=d[0]===0?[[1,0],[-1,0]]:[[0,1],[0,-1]];
+  for(let dist=1;dist<=6;dist++){
+    const cx=e.x+d[0]*dist,cy=e.y+d[1]*dist;
+    if(cx<0||cx>=COLS||cy<0||cy>=ROWS)break;
+    if(map[cy][cx]===W)break;
+    if(!los(e.x,e.y,cx,cy))break;
+    tiles.push({x:cx,y:cy});
+    const sp=Math.min(dist,2);
+    for(const pd of perps)for(let s=1;s<=sp;s++){
+      const sx=cx+pd[0]*s,sy=cy+pd[1]*s;
+      if(sx<0||sx>=COLS||sy<0||sy>=ROWS)break;
+      if(map[sy][sx]===W)break;
+      if(los(e.x,e.y,sx,sy))tiles.push({x:sx,y:sy});
+    }
+  }
+  return tiles;
+}
+
+// ── Particles ──
+function emit(x,y,col,life,vx=0,vy=0,sz=3){
+  pts.push({x:x*T+T/2,y:y*T+T/2,c:col,l:life,ml:life,vx,vy,s:sz+Math.random()*2});
+}
+function leafBurst(x,y){for(let i=0;i<6;i++)emit(x,y,Math.random()>.5?'#7a9a4a':'#5a7a2a',550,(Math.random()-.5)*2,(Math.random()-.5)*2-1);}
+function clawMark(x,y){for(let i=0;i<3;i++)emit(x,y,'rgba(200,180,140,0.6)',2200,(Math.random()-.5)*.2,(Math.random()-.5)*.2,4);}
+function furCloud(x,y){for(let i=0;i<14;i++)emit(x,y,Math.random()>.5?'#333':'#555',750,(Math.random()-.5)*3,(Math.random()-.5)*3,4);}
+function sneezeFX(x,y){for(let i=0;i<8;i++)emit(x,y,'#FFF',500,(Math.random()-.5)*4,(Math.random()-.5)*4,3);}
+
+// ── Show Codec ──
+function showCodec(t,d){codec=t;codect=d;}
+
+// ── Init ──
+function initGame(){
+  map=cloneMap();
+  disc=Array.from({length:ROWS},()=>Array(COLS).fill(false));
+  pl={x:1,y:1,dir:0,hidden:false,sprinting:false,fr:0};
+  // 5 enemies with smarter patrol routes (loop patrols)
+  ens=[
+    {x:6,y:5, vd:1, pat:[[6,5],[6,9],[3,9],[3,5]], pi:0, mode:'patrol',
+     lastSeen:null, invTimer:0, hearTarget:null, spd:420, mt:0, at:0, st:0, susLv:0},
+    {x:18,y:3, vd:3, pat:[[18,3],[22,3],[22,7],[18,7]], pi:0, mode:'patrol',
+     lastSeen:null, invTimer:0, hearTarget:null, spd:400, mt:0, at:0, st:0, susLv:0},
+    {x:11,y:13, vd:2, pat:[[11,13],[15,13],[15,17],[11,17]], pi:0, mode:'patrol',
+     lastSeen:null, invTimer:0, hearTarget:null, spd:390, mt:0, at:0, st:0, susLv:0},
+    {x:22,y:11, vd:0, pat:[[22,11],[22,7],[20,7],[20,11]], pi:0, mode:'patrol',
+     lastSeen:null, invTimer:0, hearTarget:null, spd:430, mt:0, at:0, st:0, susLv:0},
+    {x:5,y:15, vd:3, pat:[[5,15],[9,15],[9,13],[5,13]], pi:0, mode:'patrol',
+     lastSeen:null, invTimer:0, hearTarget:null, spd:410, mt:0, at:0, st:0, susLv:0},
+  ];
+  pts=[];afxs=[];cans=[];
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(map[r][c]===C)cans.push({x:c,y:r,got:false});
+  timer=TOTAL_TIME;mvt=0;furCD=0;stam=100;codect=0;codec='';shake=0;
+  showCodec('黑吉，收集 3 個金罐頭再逃到出口！小心保全！',3500);
+}
+
+// ═══════════════════════════
+//  SMART AI
+// ═══════════════════════════
+function updateAI(e,dt){
+  if(e.st>0){e.st-=dt;return;}
+
+  // — Perception —
+  const vtiles=visionCone(e);
+  let see=false;
+  if(!pl.hidden) see=vtiles.some(t=>t.x===pl.x&&t.y===pl.y);
+
+  // Hearing: sprint noise in radius 4, normal move radius 2
+  let hear=false;
+  const dist=Math.abs(e.x-pl.x)+Math.abs(e.y-pl.y);
+  if(pl.sprinting && dist<=5 && !pl.hidden){ hear=true; }
+  else if(dist<=2 && !pl.hidden && inp.dir>=0){ hear=true; }
+
+  // Claw mark detection
+  const clawInView=pts.filter(p=>{
+    const px=Math.floor(p.x/T),py=Math.floor(p.y/T);
+    return vtiles.some(t=>t.x===px&&t.y===py)&&p.c.includes('200,180,140');
+  });
+
+  // — State transitions —
+  if(see){
+    // Confirmed visual — full chase
+    if(e.mode!=='chase'){
+      e.at=700;sfx.alert();
+      afxs.push({x:e.x,y:e.y,t:700});
+      shake=250;
+      // Alert nearby allies
+      ens.forEach(a=>{
+        if(a===e||a.st>0)return;
+        const ad=Math.abs(a.x-e.x)+Math.abs(a.y-e.y);
+        if(ad<=8){
+          a.mode='investigate';
+          a.lastSeen={x:pl.x,y:pl.y};
+          a.invTimer=5000;
+          a.susLv=Math.min(a.susLv+30,100);
+        }
+      });
+    }
+    e.mode='chase';
+    e.lastSeen={x:pl.x,y:pl.y};
+    e.susLv=100;
+    e.invTimer=6000;
+  } else if(e.mode==='chase'){
+    // Lost sight → investigate last known pos
+    e.mode='investigate';
+    e.invTimer=6000;
+    e.susLv=Math.max(e.susLv-5,0);
+  }
+
+  if(!see && hear && e.mode==='patrol'){
+    // Heard something → investigate
+    e.mode='investigate';
+    e.hearTarget={x:pl.x,y:pl.y};
+    e.lastSeen={x:pl.x,y:pl.y};
+    e.invTimer=4000;
+    e.susLv=Math.min(e.susLv+20,80);
+    sfx.hear();
+  }
+
+  if(!see && clawInView.length>0 && e.mode==='patrol'){
+    const p=clawInView[0];
+    e.mode='investigate';
+    e.lastSeen={x:Math.floor(p.x/T),y:Math.floor(p.y/T)};
+    e.invTimer=4000;
+    e.susLv=Math.min(e.susLv+15,60);
+  }
+
+  // Investigation timeout → patrol
+  if(e.mode==='investigate'){
+    e.invTimer-=dt;
+    if(e.invTimer<=0){
+      e.mode='patrol';
+      e.lastSeen=null;
+      e.susLv=Math.max(e.susLv-20,0);
+    }
+  }
+
+  // — Movement —
+  const chaseSpd = e.spd * 0.55;   // faster chase
+  const invSpd   = e.spd * 0.75;
+  const patSpd   = e.spd;
+  const curSpd = e.mode==='chase'?chaseSpd:e.mode==='investigate'?invSpd:patSpd;
+
+  e.mt-=dt;
+  if(e.mt>0)return;
+  e.mt=curSpd;
+
+  if(e.mode==='chase'){
+    // Predictive chase: aim slightly ahead of player's direction
+    let tx=pl.x,ty=pl.y;
+    if(see){
+      const dd=[[0,-1],[0,1],[-1,0],[1,0]];
+      const pd=dd[pl.dir];
+      const ax=pl.x+pd[0]*2, ay=pl.y+pd[1]*2;
+      if(ax>=0&&ax<COLS&&ay>=0&&ay<ROWS&&map[ay][ax]!==W){
+        // Predict only if closer
+        const d1=Math.abs(e.x-tx)+Math.abs(e.y-ty);
+        const d2=Math.abs(e.x-ax)+Math.abs(e.y-ay);
+        if(d2<d1+3){tx=ax;ty=ay;}
+      }
+    }
+    const path=astar(e.x,e.y,tx,ty,false);
+    if(path&&path.length){
+      const n=path[0];
+      updateDir(e,n);
+      e.x=n.x;e.y=n.y;
+    }else{e.mode='investigate';e.invTimer=4000;}
+  }
+  else if(e.mode==='investigate'&&e.lastSeen){
+    // Go to last known, then search nearby
+    let tx=e.lastSeen.x,ty=e.lastSeen.y;
+    if(e.x===tx&&e.y===ty){
+      // Search: pick random adjacent walkable tile
+      const opts=[[0,-1],[0,1],[-1,0],[1,0]].filter(([dx,dy])=>{
+        const nx=e.x+dx,ny=e.y+dy;
+        return nx>=0&&nx<COLS&&ny>=0&&ny<ROWS&&map[ny][nx]!==W&&map[ny][nx]!==F;
+      });
+      if(opts.length){
+        const pick=opts[Math.random()*opts.length|0];
+        tx=e.x+pick[0];ty=e.y+pick[1];
+        e.lastSeen={x:tx,y:ty};
+      }else{
+        e.mode='patrol';
+      }
+    }
+    const path=astar(e.x,e.y,tx,ty,false);
+    if(path&&path.length){const n=path[0];updateDir(e,n);e.x=n.x;e.y=n.y;}
+    else e.mode='patrol';
+  }
+  else{
+    // Patrol loop
+    const tg=e.pat[e.pi];
+    if(e.x===tg[0]&&e.y===tg[1]) e.pi=(e.pi+1)%e.pat.length;
+    const pt=e.pat[e.pi];
+    const path=astar(e.x,e.y,pt[0],pt[1],false);
+    if(path&&path.length){const n=path[0];updateDir(e,n);e.x=n.x;e.y=n.y;}
+  }
+
+  // Suspicion decay
+  if(e.mode==='patrol')e.susLv=Math.max(e.susLv-0.5,0);
+
+  // Catch
+  if(e.x===pl.x&&e.y===pl.y&&!pl.hidden){gs='gameover';sfx.over();shake=500;}
+  if(e.at>0)e.at-=dt;
+}
+
+function updateDir(e,n){
+  if(n.x>e.x)e.vd=3;else if(n.x<e.x)e.vd=2;
+  else if(n.y>e.y)e.vd=1;else if(n.y<e.y)e.vd=0;
+}
+
+// ── Player Visible Tiles ──
+function playerVis(){
+  const ts=[];const R=5;
+  for(let dy=-R;dy<=R;dy++)for(let dx=-R;dx<=R;dx++){
+    const tx=pl.x+dx,ty=pl.y+dy;
+    if(tx<0||tx>=COLS||ty<0||ty>=ROWS)continue;
+    if(Math.sqrt(dx*dx+dy*dy)>R)continue;
+    if(los(pl.x,pl.y,tx,ty))ts.push({x:tx,y:ty});
+  }
+  return ts;
+}
+
+// ═══════════════════════
+//  UPDATE
+// ═══════════════════════
+function update(dt){
+  if(gs!=='playing')return;
+  syncKeys();
+
+  timer-=dt/1000;if(timer<=0){timer=0;gs='gameover';sfx.over();return;}
+  if(furCD>0)furCD-=dt;
+  if(codect>0)codect-=dt;
+  if(shake>0)shake-=dt;
+
+  // Stamina
+  pl.sprinting=inp.sprint&&stam>0;
+  if(pl.sprinting){stam-=1.5;if(stam<=0){stam=0;pl.sprinting=false;}}
+  else if(stam<100)stam+=.4;
+
+  // Hidden
+  pl.hidden=inp.hide&&map[pl.y]&&map[pl.y][pl.x]===S;
+
+  // Move
+  const delay=pl.sprinting?60:130;
+  mvt-=dt;
+  if(mvt<=0&&inp.dir>=0){
+    const dd=[[0,-1],[0,1],[-1,0],[1,0]][inp.dir];
+    if(dd){
+      const nx=pl.x+dd[0],ny=pl.y+dd[1];
+      pl.dir=inp.dir;
+      if(nx>=0&&nx<COLS&&ny>=0&&ny<ROWS){
+        const t=map[ny][nx];
+        if(t!==W){
+          if(t===F){
+            if(inp.vault){
+              const vx=nx+dd[0],vy=ny+dd[1];
+              if(vx>=0&&vx<COLS&&vy>=0&&vy<ROWS&&map[vy][vx]!==W&&map[vy][vx]!==F){
+                pl.x=vx;pl.y=vy;sfx.vault();leafBurst(nx,ny);
+              }
+            }
+          }else{
+            pl.x=nx;pl.y=ny;sfx.step();
+            if(t===L)leafBurst(nx,ny);
+            if(pl.sprinting)clawMark(pl.x,pl.y);
+            const ch=cans.find(c=>c.x===nx&&c.y===ny&&!c.got);
+            if(ch){ch.got=true;map[ny][nx]=P;sfx.can();
+              const left=cans.filter(c=>!c.got).length;
+              showCodec(left?`金罐頭 GET！剩餘 ${left} 個`:'全部到手！快衝出口！',2200);
+            }
+            if(t===X&&cans.every(c=>c.got)){gs='win';sfx.win();}
+          }
+        }
+      }
+      mvt=delay;pl.fr=1-pl.fr;
+    }
+  }
+
+  // Fur attack
+  if(inp.fur&&furCD<=0){
+    furCD=FUR_CD;sfx.fur();furCloud(pl.x,pl.y);
+    showCodec('嗤！貓毛噴嚏彈！',1200);
+    ens.forEach(e=>{
+      const d=Math.abs(e.x-pl.x)+Math.abs(e.y-pl.y);
+      if(d<=3&&los(pl.x,pl.y,e.x,e.y)){
+        e.st=2800;e.mode='patrol';e.lastSeen=null;e.susLv=0;
+        sneezeFX(e.x,e.y);
+      }
+    });
+  }
+
+  // AI
+  ens.forEach(e=>updateAI(e,dt));
+
+  // Particles
+  pts.forEach(p=>{p.l-=dt;p.x+=p.vx;p.y+=p.vy;p.vy+=.02;});
+  pts=pts.filter(p=>p.l>0);
+  afxs=afxs.filter(a=>{a.t-=dt;return a.t>0;});
+
+  // Fog discovery
+  playerVis().forEach(({x,y})=>{if(y>=0&&y<ROWS&&x>=0&&x<COLS)disc[y][x]=true;});
+
+  // Reset one-shot inputs (vault, fur)
+  inp.vault=false;inp.fur=false;
+  if(!kd.Space&&!document.querySelector('#tact b[data-a="hide"].on'))inp.hide=false;
+  if(!kd.ShiftLeft&&!kd.ShiftRight&&!document.querySelector('#tact b[data-a="sprint"].on'))inp.sprint=false;
+}
+
+// ═══════════════════════
+//  DRAW
+// ═══════════════════════
+function drawTile(x,y,t){
+  const px=x*T,py=y*T;
+  switch(t){
+    case P:cx.fillStyle=((x+y)&1)?'#344426':'#3A4A2A';cx.fillRect(px,py,T,T);
+      if((x*7+y*13)%11===0){cx.fillStyle='#4a6a2a';cx.fillRect(px+8,py+12,2,6);cx.fillRect(px+20,py+8,2,8);}break;
+    case W:cx.fillStyle='#8B3A3A';cx.fillRect(px,py,T,T);
+      cx.fillStyle='#5C1A1A';cx.fillRect(px,py,T,1);cx.fillRect(px,py+T/2,T,1);
+      if(y&1){cx.fillRect(px+T/2,py,1,T/2);cx.fillRect(px,py+T/2,1,T/2);}
+      else{cx.fillRect(px,py,1,T/2);cx.fillRect(px+T/2,py+T/2,1,T/2);}
+      cx.fillStyle='#A0522D';cx.fillRect(px+2,py+2,T-4,3);break;
+    case F:cx.fillStyle=((x+y)&1)?'#344426':'#3A4A2A';cx.fillRect(px,py,T,T);
+      cx.fillStyle='#C8B8A0';cx.fillRect(px+2,py+4,4,T-8);cx.fillRect(px+T-6,py+4,4,T-8);
+      cx.fillStyle='#E8DCC8';cx.fillRect(px,py+8,T,3);cx.fillRect(px,py+20,T,3);break;
+    case C:cx.fillStyle=((x+y)&1)?'#344426':'#3A4A2A';cx.fillRect(px,py,T,T);
+      const bob=Math.sin(Date.now()/280+x*2)*2;
+      cx.fillStyle='#C0A000';cx.fillRect(px+8,py+8+bob,16,16);
+      cx.fillStyle='#FFD700';cx.fillRect(px+10,py+10+bob,12,12);
+      cx.fillStyle='#FFF';cx.fillRect(px+12,py+11+bob,3,3);
+      cx.fillStyle='rgba(255,215,0,.15)';cx.beginPath();cx.arc(px+16,py+16+bob,14,0,Math.PI*2);cx.fill();break;
+    case X:cx.fillStyle='#3A4A2A';cx.fillRect(px,py,T,T);
+      const pu=.5+.5*Math.sin(Date.now()/200);
+      cx.fillStyle=`rgba(0,255,100,${.12+pu*.15})`;cx.fillRect(px,py,T,T);
+      cx.fillStyle='#00CC66';cx.fillRect(px+4,py+4,T-8,T-8);
+      cx.fillStyle='#FFF';cx.font='9px "Press Start 2P"';cx.fillText('EXIT',px+2,py+20);break;
+    case S:cx.fillStyle='#2A3A1E';cx.fillRect(px,py,T,T);
+      cx.fillStyle='rgba(0,0,0,.2)';cx.fillRect(px+4,py+4,T-8,T-8);break;
+    case L:cx.fillStyle=((x+y)&1)?'#344426':'#3A4A2A';cx.fillRect(px,py,T,T);
+      cx.fillStyle='#5A7A3A';for(let i=0;i<4;i++)cx.fillRect(px+6+(i*7)%16,py+10+(i*5)%12,6,4);
+      cx.fillStyle='#4A6A2A';cx.fillRect(px+12,py+14,8,4);break;
+  }
+}
+
+function drawCat(){
+  const px=pl.x*T,py=pl.y*T;
+  if(pl.hidden)cx.globalAlpha=.25+.1*Math.sin(Date.now()/180);
+  // body
+  cx.fillStyle='#1a1a1a';cx.fillRect(px+8,py+10,16,16);
+  // head
+  cx.fillStyle='#222';cx.fillRect(px+6,py+4,20,14);
+  // ears
+  cx.fillStyle='#1a1a1a';cx.fillRect(px+6,py+0,6,6);cx.fillRect(px+20,py+0,6,6);
+  cx.fillStyle='#8B4040';cx.fillRect(px+8,py+2,2,2);cx.fillRect(px+22,py+2,2,2);
+  // eyes
+  cx.fillStyle='#FFDD00';
+  const ex1=pl.dir===2?8:pl.dir===3?12:10, ex2=pl.dir===2?16:pl.dir===3?20:18;
+  cx.fillRect(px+ex1,py+8,4,4);cx.fillRect(px+ex2,py+8,4,4);
+  cx.fillStyle='#000';
+  const pdx=pl.dir===2?-1:pl.dir===3?1:0;
+  cx.fillRect(px+ex1+1+pdx,py+9,2,2);cx.fillRect(px+ex2+1+pdx,py+9,2,2);
+  // tail
+  cx.fillStyle='#1a1a1a';const tw=Math.sin(Date.now()/280)*3;
+  if(pl.dir<=1){cx.fillRect(px+22,py+18+tw,4,2);cx.fillRect(px+24,py+16+tw,4,2);}
+  // legs
+  cx.fillStyle='#1a1a1a';
+  if(pl.fr){cx.fillRect(px+8,py+24,4,4);cx.fillRect(px+20,py+24,4,4);}
+  else{cx.fillRect(px+10,py+24,4,4);cx.fillRect(px+18,py+24,4,4);}
+  // sprint FX
+  if(pl.sprinting){cx.fillStyle='rgba(255,255,255,.3)';
+    const sx2=pl.dir===3?px-6:pl.dir===2?px+T:px+6;
+    cx.fillRect(sx2,py+14,4,2);cx.fillRect(sx2+(Math.random()>.5?2:-2),py+18,3,2);
+  }
+  cx.globalAlpha=1;
+}
+
+function drawGuard(e){
+  const px=e.x*T,py=e.y*T;
+  if(e.st>0)cx.globalAlpha=.4+.3*Math.sin(Date.now()/80);
+  // body
+  cx.fillStyle='#8B6914';cx.fillRect(px+6,py+10,20,16);
+  cx.fillStyle='#A0782C';cx.fillRect(px+4,py+4,24,14);
+  cx.fillStyle='#C8A050';cx.fillRect(px+6,py+12,8,6);cx.fillRect(px+18,py+12,8,6);
+  // eyes
+  cx.fillStyle='#FFF';cx.fillRect(px+8,py+6,6,4);cx.fillRect(px+18,py+6,6,4);
+  cx.fillStyle=e.mode==='chase'?'#FF0000':e.mode==='investigate'?'#FF8800':'#333';
+  cx.fillRect(px+10,py+7,3,2);cx.fillRect(px+20,py+7,3,2);
+  if(e.mode==='chase'){cx.fillStyle='#5A3A00';cx.fillRect(px+8,py+4,6,2);cx.fillRect(px+18,py+4,6,2);}
+  // hat
+  cx.fillStyle='#1a1a3a';cx.fillRect(px+4,py+0,24,6);cx.fillRect(px+6,py-2,20,4);
+  cx.fillStyle='#FFD700';cx.fillRect(px+14,py+1,4,3);
+  // legs
+  cx.fillStyle='#8B6914';cx.fillRect(px+8,py+24,5,4);cx.fillRect(px+19,py+24,5,4);
+  // suspicion indicator
+  if(e.susLv>0&&e.mode!=='patrol'){
+    cx.fillStyle=e.mode==='chase'?'#FF0000':'#FF8800';
+    const bw=Math.round(e.susLv/100*20);
+    cx.fillRect(px+6,py-6,bw,3);
+    cx.strokeStyle='#333';cx.lineWidth=1;cx.strokeRect(px+6,py-6,20,3);
+  }
+  // investigate ?
+  if(e.mode==='investigate'&&e.st<=0){
+    cx.fillStyle='#FF8800';cx.font='14px "Press Start 2P"';cx.fillText('?',px+12,py-4);
+  }
+  // stun stars
+  if(e.st>0){
+    cx.fillStyle='#FFD700';const st2=Date.now()/180;
+    for(let i=0;i<3;i++){const sx=px+16+Math.cos(st2+i*2.1)*12,sy=py-4+Math.sin(st2+i*2.1)*6;cx.fillRect(sx,sy,4,4);}
+  }
+  cx.globalAlpha=1;
+  // alert !
+  const af=afxs.find(a=>a.x===e.x&&a.y===e.y);
+  if(af){const sc=Math.min(1,af.t/350);cx.fillStyle='#FF0000';cx.font=`${20+12*sc}px "Press Start 2P"`;cx.fillText('!',px+10,py-10-12*(1-sc));}
+}
+
+function drawVis(e){
+  if(e.st>0)return;
+  const ts=visionCone(e);
+  ts.forEach(t=>{
+    cx.fillStyle='rgba(255,220,60,.10)';cx.fillRect(t.x*T,t.y*T,T,T);
+    cx.strokeStyle='rgba(255,220,60,.2)';cx.lineWidth=.5;cx.strokeRect(t.x*T,t.y*T,T,T);
+  });
+}
+
+function drawFog(){
+  const vis=new Set();
+  playerVis().forEach(t=>vis.add(t.y*COLS+t.x));
+  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
+    if(vis.has(y*COLS+x))continue;
+    cx.fillStyle=disc[y][x]?'rgba(10,10,10,.7)':'#0a0a0a';
+    cx.fillRect(x*T,y*T,T,T);
+  }
+  playerVis().forEach(t=>{
+    const d=Math.sqrt((t.x-pl.x)**2+(t.y-pl.y)**2);
+    if(d>3.5){cx.fillStyle=`rgba(10,10,10,${Math.min((d-3.5)/1.5*.4,.4)})`;cx.fillRect(t.x*T,t.y*T,T,T);}
+  });
+}
+
+function drawPts(){pts.forEach(p=>{cx.globalAlpha=p.l/p.ml;cx.fillStyle=p.c;cx.fillRect(p.x-p.s/2,p.y-p.s/2,p.s,p.s);});cx.globalAlpha=1;}
+
+function drawCodecBox(){
+  if(codect<=0)return;
+  cx.globalAlpha=Math.min(1,codect/400);
+  const bw=MW-40,bx=20,by=MH-60;
+  cx.fillStyle='rgba(0,20,10,.88)';cx.fillRect(bx,by,bw,44);
+  cx.strokeStyle='#00FF88';cx.lineWidth=2;cx.strokeRect(bx,by,bw,44);
+  cx.fillStyle='#222';cx.fillRect(bx+8,by+10,20,20);
+  cx.fillStyle='#FFDD00';cx.fillRect(bx+12,by+16,4,4);cx.fillRect(bx+20,by+16,4,4);
+  cx.fillStyle='#00FF88';cx.font='9px "Press Start 2P"';
+  const mc=Math.floor((bw-44)/7.5);
+  cx.fillText(codec.substring(0,mc),bx+34,by+20);
+  if(codec.length>mc)cx.fillText(codec.substring(mc),bx+34,by+34);
+  cx.globalAlpha=1;
+}
+
+function drawHUD(){
+  const got=cans.filter(c=>c.got).length;
+  $('h1').innerHTML=`🐱 黑吉<br>🥫 ${got}/3 ⏱ ${Math.ceil(timer)}s`;
+  const sb='█'.repeat(Math.floor(stam/10))+'░'.repeat(10-Math.floor(stam/10));
+  const fr=furCD<=0?'✅':`${Math.ceil(furCD/1000)}s`;
+  $('h2').innerHTML=`衝刺 ${sb}<br>貓毛 ${fr}`;
+  // Update fur button style
+  const fb=$('bFur');
+  if(furCD>0)fb.classList.add('cd');else fb.classList.remove('cd');
+}
+
+function render(){
+  cx.save();
+  if(shake>0)cx.translate((Math.random()-.5)*6,(Math.random()-.5)*6);
+  cx.fillStyle='#0a0a0a';cx.fillRect(0,0,MW,MH);
+  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)drawTile(x,y,map[y][x]);
+  ens.forEach(drawVis);
+  drawCat();
+  ens.forEach(drawGuard);
+  drawPts();
+  drawFog();
+  drawCodecBox();
+  cx.fillStyle='rgba(30,60,20,.06)';cx.fillRect(0,0,MW,MH);
+  cx.restore();
+  drawHUD();
+}
+
+// ═══════════════════════
+//  TITLE SCREEN EYES
+// ═══════════════════════
+let eyeCanvas=null, eyeCtx=null;
+let blinkState=0, blinkTimer=0, nextBlink=2000;
+
+function drawEyes(dt){
+  if(!eyeCanvas)return;
+  const w=eyeCanvas.width, h=eyeCanvas.height;
+  eyeCtx.fillStyle='#050505';
+  eyeCtx.fillRect(0,0,w,h);
+
+  // Blink logic
+  blinkTimer+=dt;
+  if(blinkState===0&&blinkTimer>nextBlink){
+    blinkState=1;blinkTimer=0;// closing
+  }else if(blinkState===1&&blinkTimer>80){
+    blinkState=2;blinkTimer=0;// closed
+  }else if(blinkState===2&&blinkTimer>100){
+    blinkState=3;blinkTimer=0;// opening
+  }else if(blinkState===3&&blinkTimer>80){
+    blinkState=0;blinkTimer=0;nextBlink=1800+Math.random()*3000;// open
+  }
+
+  // Eye openness
+  let openness=1;
+  if(blinkState===1)openness=1-blinkTimer/80;
+  else if(blinkState===2)openness=0;
+  else if(blinkState===3)openness=blinkTimer/80;
+
+  const eyeW=50, eyeH=36, gap=30;
+  const cx1=w/2-gap/2-eyeW/2, cx2=w/2+gap/2+eyeW/2;
+  const cy=h/2;
+
+  for(const ex of [cx1,cx2]){
+    // Outer glow
+    const grd=eyeCtx.createRadialGradient(ex,cy,8,ex,cy,eyeW*0.9);
+    grd.addColorStop(0,'rgba(255,200,0,.12)');
+    grd.addColorStop(1,'rgba(255,200,0,0)');
+    eyeCtx.fillStyle=grd;
+    eyeCtx.fillRect(ex-eyeW,cy-eyeW,eyeW*2,eyeW*2);
+
+    // Eye shape (almond) with blink
+    const halfH=eyeH/2*openness;
+    if(halfH<1)continue;
+
+    eyeCtx.save();
+    eyeCtx.beginPath();
+    eyeCtx.moveTo(ex-eyeW/2, cy);
+    eyeCtx.quadraticCurveTo(ex, cy-halfH, ex+eyeW/2, cy);
+    eyeCtx.quadraticCurveTo(ex, cy+halfH, ex-eyeW/2, cy);
+    eyeCtx.closePath();
+    eyeCtx.clip();
+
+    // Iris gradient
+    const ig=eyeCtx.createRadialGradient(ex,cy,2,ex,cy,eyeW/2.5);
+    ig.addColorStop(0,'#FFEE44');
+    ig.addColorStop(.5,'#FFCC00');
+    ig.addColorStop(.85,'#CC8800');
+    ig.addColorStop(1,'#885500');
+    eyeCtx.fillStyle=ig;
+    eyeCtx.fillRect(ex-eyeW/2,cy-halfH,eyeW,halfH*2);
+
+    // Pupil (vertical slit)
+    eyeCtx.fillStyle='#000';
+    const pw=4, ph2=halfH*.85;
+    eyeCtx.beginPath();
+    eyeCtx.ellipse(ex,cy,pw,ph2,0,0,Math.PI*2);
+    eyeCtx.fill();
+
+    // Highlight
+    eyeCtx.fillStyle='rgba(255,255,255,.55)';
+    eyeCtx.beginPath();
+    eyeCtx.ellipse(ex-8,cy-halfH*.3,4,3,-.3,0,Math.PI*2);
+    eyeCtx.fill();
+
+    eyeCtx.restore();
+
+    // Eyelid outline
+    eyeCtx.strokeStyle='#FFCC00';
+    eyeCtx.lineWidth=1.5;
+    eyeCtx.beginPath();
+    eyeCtx.moveTo(ex-eyeW/2, cy);
+    eyeCtx.quadraticCurveTo(ex, cy-halfH, ex+eyeW/2, cy);
+    eyeCtx.quadraticCurveTo(ex, cy+halfH, ex-eyeW/2, cy);
+    eyeCtx.closePath();
+    eyeCtx.stroke();
+  }
+
+  // Subtle floating dust
+  eyeCtx.fillStyle='rgba(255,200,0,.08)';
+  for(let i=0;i<5;i++){
+    const dx=(Date.now()/2000+i*.7)%1*w;
+    const dy=h*.3+Math.sin(Date.now()/1500+i*1.3)*h*.25;
+    eyeCtx.fillRect(dx,dy,2,2);
+  }
+}
+
+// ── Overlays ──
+function showOv(){
+  const ov=$('ov'),ct=$('ovc');
+  ov.classList.remove('hide');
+
+  if(gs==='title'){
+    ct.innerHTML=`
+      <canvas id="eyeCanvas" width="220" height="100" style="display:block;margin:0 auto 12px;image-rendering:auto;"></canvas>
+      <h1>天玉街の黑吉</h1>
+      <h2>— 貓 鼠 遊 戲 —</h2>
+      <p>在天玉街的巷弄中收集 3 個金罐頭</p>
+      <p>避開保全鬥牛犬的視線 抵達逃生口！</p>
+      <br>
+      <p>🐾 隱身（陰影格）｜ 衝刺 ｜ 翻越柵欄 ｜ 貓毛噴嚏彈</p>
+      <div class="btn" id="startBtn">開始潛入</div>
+    `;
+    eyeCanvas=$('eyeCanvas');eyeCtx=eyeCanvas.getContext('2d');
+    blinkState=0;blinkTimer=0;nextBlink=1500;
+    $('startBtn').addEventListener('click',()=>{ia();initGame();gs='playing';$('ov').classList.add('hide');});
+    $('startBtn').addEventListener('touchend',e=>{e.preventDefault();ia();initGame();gs='playing';$('ov').classList.add('hide');});
+  }else if(gs==='gameover'){
+    const got=cans.filter(c=>c.got).length;
+    ct.innerHTML=`
+      <h1>被抓到了！</h1>
+      <h2>黑吉被保全逮住了...</h2>
+      <p>收集了 ${got}/3 個罐頭</p>
+      <p>存活時間：${TOTAL_TIME-Math.ceil(timer)} 秒</p>
+      <div class="btn" id="retryBtn">再試一次</div>
+    `;
+    $('retryBtn').addEventListener('click',()=>{initGame();gs='playing';$('ov').classList.add('hide');});
+    $('retryBtn').addEventListener('touchend',e=>{e.preventDefault();initGame();gs='playing';$('ov').classList.add('hide');});
+  }else if(gs==='win'){
+    ct.innerHTML=`
+      <h1>逃脫成功！</h1>
+      <h2>黑吉帶著金罐頭安全脫逃了！</h2>
+      <p>剩餘時間：${Math.ceil(timer)} 秒</p>
+      <p>天玉街永遠歡迎你回來，黑吉。</p>
+      <div class="btn" id="againBtn">再玩一次</div>
+    `;
+    $('againBtn').addEventListener('click',()=>{initGame();gs='playing';$('ov').classList.add('hide');});
+    $('againBtn').addEventListener('touchend',e=>{e.preventDefault();initGame();gs='playing';$('ov').classList.add('hide');});
+  }
+}
+
+// ── Game Loop ──
+function loop(ts){
+  const dt=Math.min(ts-lt,50);lt=ts;
+  if(gs==='playing'){
+    $('ov').classList.add('hide');
+    update(dt);render();
+  }else{
+    if(gs==='title'){
+      drawEyes(dt);
+    }else{
+      render();
+    }
+    showOv();
+  }
+  requestAnimationFrame(loop);
+}
+showOv();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
