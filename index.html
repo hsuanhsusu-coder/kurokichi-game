@@ -8,10 +8,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+TC:wght@400;700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
 html,body{width:100%;height:100%;overflow:hidden;background:#030303;font-family:'Noto Sans TC',sans-serif;}
-#rotateMsg{display:none;position:fixed;inset:0;z-index:999;background:#030303;color:#f0c040;font:14px/1.6 'Press Start 2P',monospace;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px;}
-#rotateMsg .icon{font-size:48px;animation:rotA 2s ease-in-out infinite;}
-@keyframes rotA{0%,100%{transform:rotate(0deg);}50%{transform:rotate(90deg);}}
-@media(orientation:portrait) and (max-width:600px){#rotateMsg{display:flex!important;}#gameUI{display:none!important;}}
+/* No rotation block — game works in any orientation */
 #gameUI{display:flex;flex-direction:column;height:100%;width:100%;}
 #hud{height:36px;min-height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:rgba(0,0,0,.94);border-bottom:2px solid #f0c040;font:10px/1 'Press Start 2P',monospace;color:#f0c040;z-index:20;flex-shrink:0;}
 #timerBox{font-size:20px;color:#ff6644;min-width:44px;text-align:center;}
@@ -55,7 +52,7 @@ canvas#c{display:block;image-rendering:pixelated;image-rendering:crisp-edges;}
 </style>
 </head>
 <body>
-<div id="rotateMsg"><div class="icon">📱</div><div>請旋轉手機<br>橫向遊玩！</div></div>
+<!-- Game works on any screen -->
 <div id="gameUI">
   <div id="hud">
     <div style="display:flex;align-items:center;gap:5px"><span id="canBox">🥫 0/3</span></div>
@@ -76,8 +73,15 @@ canvas#c{display:block;image-rendering:pixelated;image-rendering:crisp-edges;}
 <script>
 const $=id=>document.getElementById(id),cv=$('c'),cx=cv.getContext('2d');
 const T=32,CO=27,RO=21,MW=CO*T,MH=RO*T;cv.width=MW;cv.height=MH;
-function resize(){const ma=$('mainArea');if(!ma)return;const s=Math.min(ma.clientWidth*.92/MW,ma.clientHeight*.98/MH,1.5);cv.style.width=(MW*s|0)+'px';cv.style.height=(MH*s|0)+'px';}
-window.addEventListener('resize',resize);setTimeout(resize,100);setTimeout(resize,500);
+function resize(){const ma=$('mainArea');if(!ma)return;
+  // Use window dimensions as fallback
+  const w=ma.clientWidth||window.innerWidth;
+  const h=ma.clientHeight||(window.innerHeight-36);
+  const s=Math.min(w*.95/MW,h*.95/MH,2);
+  cv.style.width=(MW*s|0)+'px';cv.style.height=(MH*s|0)+'px';}
+window.addEventListener('resize',resize);
+window.addEventListener('orientationchange',()=>{setTimeout(resize,200);setTimeout(resize,600);});
+setTimeout(resize,50);setTimeout(resize,300);setTimeout(resize,800);
 
 // Tiles
 const P=0,WL=1,CN=3,EX=4,SH=5,LF=6,PL=7,LT=8,CP=9,TR=10,SN=11;
@@ -182,7 +186,7 @@ function clawM(x,y){for(let i=0;i<3;i++)emit(x,y,'rgba(200,180,140,0.5)',2200,(M
 function meowR(x,y){for(let i=0;i<14;i++){const a=Math.PI*2*i/14;emit(x,y,'rgba(255,100,150,0.7)',800,Math.cos(a)*1.5,Math.sin(a)*1.5,4);}}
 function sparkle(x,y){for(let i=0;i<8;i++)emit(x,y,'#FFD700',500,(Math.random()-.5)*2.5,(Math.random()-.5)*2.5-1,3);}
 function tSpark(x,y){for(let i=0;i<6;i++)emit(x,y,'#44ff88',600,(Math.random()-.5)*2,(Math.random()-1)*2,3);}
-function crashFX(x,y){for(let i=0;i<12;i++)emit(x,y,Math.random()>.5?'#fff':'#ff8':'#ffa',600,(Math.random()-.5)*4,(Math.random()-.5)*4,5);}
+function crashFX(x,y){for(let i=0;i<12;i++)emit(x,y,Math.random()>.5?'#fff':'#ffa500',600,(Math.random()-.5)*4,(Math.random()-.5)*4,5);}
 function showCodec(t,d){codec=t;codect=d;}
 function showTB(s){const tp=$('tpop');tp.textContent=`+${s}s`;tp.classList.remove('show');void tp.offsetWidth;tp.classList.add('show');tbTimer=1300;sfx.timeUp();}
 function addStyle(p,r){styleScore+=p;const rp=$('rpop');rp.style.color=p>=25?'#ff2222':p>=15?'#ff8800':'#88ff88';rp.textContent=`+${p} ${r}`;rp.classList.add('show');rankTimer=1200;sfx.rank();}
@@ -444,7 +448,7 @@ let eyeCV,eyeCX,blkS=0,blkT=0,nxtBlk=1500;
 function drawEyes(dt){if(!eyeCV)return;const w=eyeCV.width,h=eyeCV.height;eyeCX.fillStyle='#030303';eyeCX.fillRect(0,0,w,h);blkT+=dt;if(blkS===0&&blkT>nxtBlk){blkS=1;blkT=0;}else if(blkS===1&&blkT>90){blkS=2;blkT=0;}else if(blkS===2&&blkT>100){blkS=3;blkT=0;}else if(blkS===3&&blkT>90){blkS=0;blkT=0;nxtBlk=2000+Math.random()*3000;}let op=1;if(blkS===1)op=1-blkT/90;else if(blkS===2)op=0;else if(blkS===3)op=blkT/90;const eW=55,eH=38,gap=35,cy=h/2;for(const ex of[w/2-gap/2-eW/2,w/2+gap/2+eW/2]){const grd=eyeCX.createRadialGradient(ex,cy,5,ex,cy,eW);grd.addColorStop(0,'rgba(255,200,0,.16)');grd.addColorStop(1,'rgba(255,200,0,0)');eyeCX.fillStyle=grd;eyeCX.fillRect(ex-eW,cy-eW,eW*2,eW*2);const hH=eH/2*op;if(hH<1)continue;eyeCX.save();eyeCX.beginPath();eyeCX.moveTo(ex-eW/2,cy);eyeCX.quadraticCurveTo(ex,cy-hH,ex+eW/2,cy);eyeCX.quadraticCurveTo(ex,cy+hH,ex-eW/2,cy);eyeCX.closePath();eyeCX.clip();const ig=eyeCX.createRadialGradient(ex,cy,2,ex,cy,eW/2.2);ig.addColorStop(0,'#FFEE44');ig.addColorStop(.45,'#FFCC00');ig.addColorStop(.8,'#CC8800');ig.addColorStop(1,'#885500');eyeCX.fillStyle=ig;eyeCX.fillRect(ex-eW/2,cy-hH,eW,hH*2);eyeCX.fillStyle='#000';eyeCX.beginPath();eyeCX.ellipse(ex,cy,4,hH*.85,0,0,Math.PI*2);eyeCX.fill();eyeCX.fillStyle='rgba(255,255,255,.5)';eyeCX.beginPath();eyeCX.ellipse(ex-8,cy-hH*.3,4,3,-.3,0,Math.PI*2);eyeCX.fill();eyeCX.restore();eyeCX.strokeStyle='#FFCC00';eyeCX.lineWidth=1.5;eyeCX.beginPath();eyeCX.moveTo(ex-eW/2,cy);eyeCX.quadraticCurveTo(ex,cy-hH,ex+eW/2,cy);eyeCX.quadraticCurveTo(ex,cy+hH,ex-eW/2,cy);eyeCX.closePath();eyeCX.stroke();}}
 
 function showOv(){const ov=$('ov'),ct=$('ovc');ov.classList.remove('hide');
-if(gs==='title'){const best=getBest();ct.innerHTML=`<canvas id="eyeC" width="240" height="90" style="display:block;margin:0 auto 8px;image-rendering:auto;"></canvas><h1>天玉街の黑吉</h1><h2>— 戰 術 戲 耍 版 —</h2>${best?`<p class="best">🏆 最高：${best}分</p>`:''}<div class="sinfo"><p><span class="k">📦</span> 紙箱偽裝 — 任何地方隱身</p><p><span class="k">💥</span> 衝撞 — 撞翻保全！4s CD</p><p><span class="k">😻</span> 喵叫 — ❤️ 引保全蹲下摸貓</p></div><p class="tip">🍌 垃圾桶撞倒→香蕉皮→保全滑壘</p><p class="tip">🌺 盆栽旁=SAFE ｜ 💡 感應燈=保全加速</p><p class="tip">📱 橫向遊玩最佳體驗！</p><div class="btn" id="startBtn">開始戲耍</div>`;eyeCV=$('eyeC');eyeCX=eyeCV.getContext('2d');blkS=0;blkT=0;nxtBlk=1500;$('startBtn').addEventListener('click',startGame);$('startBtn').addEventListener('touchend',e=>{e.preventDefault();startGame();});}
+if(gs==='title'){const best=getBest();ct.innerHTML=`<canvas id="eyeC" width="240" height="90" style="display:block;margin:0 auto 8px;image-rendering:auto;"></canvas><h1>天玉街の黑吉</h1><h2>— 戰 術 戲 耍 版 —</h2>${best?`<p class="best">🏆 最高：${best}分</p>`:''}<div class="sinfo"><p><span class="k">📦</span> 紙箱偽裝 — 任何地方隱身</p><p><span class="k">💥</span> 衝撞 — 撞翻保全！4s CD</p><p><span class="k">😻</span> 喵叫 — ❤️ 引保全蹲下摸貓</p></div><p class="tip">🍌 垃圾桶撞倒→香蕉皮→保全滑壘</p><p class="tip">🌺 盆栽旁=SAFE ｜ 💡 感應燈=保全加速</p><p class="tip">🕹️ 搖桿/方向鍵移動 ｜ 右側按鈕/鍵盤技能</p><p class="tip">⌨️ SPACE=紙箱 SHIFT=衝撞 F=喵叫</p><div class="btn" id="startBtn">開始戲耍</div>`;eyeCV=$('eyeC');eyeCX=eyeCV.getContext('2d');blkS=0;blkT=0;nxtBlk=1500;$('startBtn').addEventListener('click',startGame);$('startBtn').addEventListener('touchend',e=>{e.preventDefault();startGame();});}
 else if(gs==='gameover'){const got=cans.filter(c=>c.got).length;ct.innerHTML=`<h1>被抓到了！</h1><h2>黑吉被保全逮住了...</h2><p style="font-size:12px;color:#ccc;">🥫 ${got}/3 ⭐ ${styleScore}分 💥 撞翻${knockCount}次</p><div class="btn" id="retryBtn">再試一次</div>`;$('retryBtn').addEventListener('click',startGame);$('retryBtn').addEventListener('touchend',e=>{e.preventDefault();startGame();});}
 else if(gs==='win'){let g='C';if(styleScore>=100)g='S';else if(styleScore>=60)g='A';else if(styleScore>=30)g='B';let title='';if(!wasDetected)title='🥷 天玉街の影子';else if(knockCount>=3)title='💪 保全剋星';else if(timer<=3)title='⚡ 極限運動貓';else if(combo>=3)title='🎯 罐頭獵人';else if(styleScore>=80)title='🌟 潛行大師';const best=getBest();const isNew=styleScore>best;if(isNew&&styleScore>0)setBest(styleScore);ct.innerHTML=`<h1>逃脫成功！</h1>${title?`<p class="title-tag">${title}</p>`:''}<p style="font-size:18px;color:#f0c040;margin:6px 0;">評價：${g}</p><p style="font-size:12px;color:#ccc;">⏱${Math.ceil(timer)}s ⭐${styleScore} 💥${knockCount}撞${isNew?' 🆕':''}</p>${best?`<p class="best">🏆 最高：${Math.max(best,styleScore)}分</p>`:''}<div class="btn" id="againBtn">再玩一次</div>`;$('againBtn').addEventListener('click',startGame);$('againBtn').addEventListener('touchend',e=>{e.preventDefault();startGame();});}}
 function startGame(){ia();initGame();gs='playing';$('ov').classList.add('hide');setTimeout(resize,100);}
