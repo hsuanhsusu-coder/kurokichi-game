@@ -10,9 +10,9 @@
 html,body{width:100%;height:100%;overflow:hidden;background:#030303;font-family:'Noto Sans TC',sans-serif;}
 /* No rotation block — game works in any orientation */
 #gameUI{display:flex;flex-direction:column;height:100%;width:100%;}
-#hud{height:36px;min-height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:rgba(0,0,0,.94);border-bottom:2px solid #f0c040;font:10px/1 'Press Start 2P',monospace;color:#f0c040;z-index:20;flex-shrink:0;}
-#timerBox{font-size:20px;color:#ff6644;min-width:44px;text-align:center;}
-#comboBox{font-size:9px;color:#ff44ff;opacity:0;transition:opacity .2s;margin-left:6px;}
+#hud{height:36px;min-height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:rgba(0,0,0,.94);border-bottom:2px solid #f0c040;font:11px/1 'Press Start 2P',monospace;color:#f0c040;z-index:20;flex-shrink:0;}
+#timerBox{font-size:22px;color:#ff6644;min-width:48px;text-align:center;}
+#comboBox{font-size:10px;color:#ff44ff;opacity:0;transition:opacity .2s;margin-left:6px;}
 #comboBox.show{opacity:1;}
 #mainArea{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 canvas#c{display:block;image-rendering:pixelated;image-rendering:crisp-edges;}
@@ -55,20 +55,20 @@ canvas#c{display:block;image-rendering:pixelated;image-rendering:crisp-edges;}
 #ov.hide{display:none;}
 #ov .bg{position:absolute;inset:0;background:rgba(3,3,3,.94);}
 #ov .ct{position:relative;z-index:1;text-align:center;color:#f0c040;font-family:'Press Start 2P',monospace;padding:12px;max-width:520px;width:94%;max-height:88vh;overflow-y:auto;}
-#ov h1{font-size:18px;text-shadow:3px 3px 0 #8b0000;line-height:1.7;margin-bottom:4px;}
-#ov h2{font-size:11px;color:#ddd;line-height:1.7;margin-bottom:8px;}
-#ov p{font-size:8px;color:#aaa;line-height:2.1;}
+#ov h1{font-size:19px;text-shadow:3px 3px 0 #8b0000;line-height:1.6;margin-bottom:6px;}
+#ov h2{font-size:11px;color:#ddd;line-height:1.6;margin-bottom:10px;}
+#ov p{font-size:9px;color:#bbb;line-height:1.9;}
 .sinfo{text-align:left;display:inline-block;margin:4px 0;}
-.sinfo p{font-size:9px;line-height:2.4;color:#ccc;}
-.sinfo .k{display:inline-block;min-width:28px;text-align:center;background:rgba(240,192,64,.18);border:1px solid #f0c040;border-radius:3px;padding:1px 4px;font-size:10px;color:#f0c040;margin-right:3px;}
+.sinfo p{font-size:10px;line-height:2.0;color:#ddd;}
+.sinfo .k{display:inline-block;min-width:26px;text-align:center;background:rgba(240,192,64,.18);border:1px solid #f0c040;border-radius:3px;padding:1px 4px;font-size:11px;color:#f0c040;margin-right:3px;}
 .btn{display:inline-block;margin-top:12px;padding:14px 40px;background:#8b0000;color:#f0c040;border:3px solid #f0c040;font:14px 'Press Start 2P',monospace;cursor:pointer;border-radius:3px;}
 .btn:active{background:#f0c040;color:#0a0a0a;}
-.tip{font-size:7px;color:#88ff88;line-height:1.9;margin-top:2px;}
-.best{font-size:9px;color:#ff8800;margin-top:4px;}
-.title-tag{font-size:10px;color:#ff44ff;margin:4px 0;}
-#rpop{position:fixed;top:40px;left:50%;transform:translateX(-50%);z-index:25;font:14px 'Press Start 2P',monospace;text-shadow:0 0 10px currentColor;opacity:0;transition:opacity .15s;pointer-events:none;white-space:nowrap;}
+.tip{font-size:9px;color:#88ff88;line-height:1.8;margin-top:3px;}
+.best{font-size:11px;color:#ff8800;margin-top:5px;}
+.title-tag{font-size:11px;color:#ff44ff;margin:5px 0;}
+#rpop{position:fixed;top:46px;left:50%;transform:translateX(-50%);z-index:25;font:15px 'Press Start 2P',monospace;text-shadow:0 0 10px currentColor,0 2px 4px rgba(0,0,0,.8);opacity:0;transition:opacity .15s;pointer-events:none;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis;}
 #rpop.show{opacity:1;}
-#tpop{position:fixed;top:58px;left:50%;transform:translateX(-50%);z-index:25;font:16px 'Press Start 2P',monospace;color:#44ff88;text-shadow:0 0 12px #00ff66;opacity:0;pointer-events:none;}
+#tpop{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:25;font:18px 'Press Start 2P',monospace;color:#44ff88;text-shadow:0 0 12px #00ff66,0 2px 4px rgba(0,0,0,.8);opacity:0;pointer-events:none;}
 #tpop.show{animation:floatUp 1.3s ease-out forwards;}
 @keyframes floatUp{0%{opacity:1;transform:translateX(-50%) translateY(0);}70%{opacity:1;}100%{opacity:0;transform:translateX(-50%) translateY(-36px);}}
 #btFlash{position:fixed;inset:0;z-index:15;pointer-events:none;opacity:0;transition:opacity .1s;background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,80,.25) 100%);border:3px solid rgba(100,150,255,.3);}
@@ -154,8 +154,7 @@ const BASE_MAP=[
 const CAN_SLOTS=[{x:2,y:2},{x:11,y:1},{x:24,y:2},{x:2,y:9},{x:14,y:9},{x:24,y:5},{x:2,y:17},{x:11,y:15},{x:22,y:18},{x:18,y:11}];
 const PLANTER_SLOTS=[{x:6,y:1},{x:20,y:2},{x:8,y:5},{x:23,y:6},{x:6,y:9},{x:16,y:11},{x:3,y:15},{x:11,y:17},{x:22,y:16},{x:15,y:5},{x:20,y:19},{x:8,y:13},{x:25,y:15}];
 const TRASH_POS=[{x:12,y:5},{x:6,y:11},{x:18,y:15},{x:10,y:3}];
-const SENSOR_POS=[{x:13,y:3},{x:1,y:8},{x:25,y:10},{x:14,y:18}];
-// Golden mouse: only spawns in "risky" spots — inside sensor cones, near patrols, or deep corners
+// Golden mouse: only spawns in deep corners or near patrols (high-risk = high-reward)
 const GOLDEN_MOUSE_SLOTS=[{x:13,y:4},{x:25,y:11},{x:14,y:17},{x:1,y:19},{x:25,y:1},{x:9,y:13}];
 const EXIT_POS={x:24,y:19};
 
@@ -164,9 +163,8 @@ function buildMap(){const m=BASE_MAP.map(r=>[...r]);m[EXIT_POS.y][EXIT_POS.x]=EX
 shuffle(CAN_SLOTS).slice(0,3).forEach(c=>{if(m[c.y][c.x]!==WL)m[c.y][c.x]=CN;});
 shuffle(PLANTER_SLOTS).slice(0,6).forEach(p=>{if(m[p.y][p.x]===P||m[p.y][p.x]===LF)m[p.y][p.x]=PL;});
 TRASH_POS.forEach(t=>{if(m[t.y][t.x]===P)m[t.y][t.x]=TR;});
-SENSOR_POS.forEach(s=>{if(m[s.y][s.x]===P||m[s.y][s.x]===LT)m[s.y][s.x]=SN;});
-// Place ONE golden mouse in a random valid slot
-const gm=shuffle(GOLDEN_MOUSE_SLOTS).find(g=>m[g.y][g.x]===P||m[g.y][g.x]===SN);
+// Place ONE golden mouse in a random valid floor slot
+const gm=shuffle(GOLDEN_MOUSE_SLOTS).find(g=>m[g.y][g.x]===P);
 if(gm)m[gm.y][gm.x]=GM;
 return m;}
 
@@ -178,7 +176,7 @@ meow(){tone(700,.08,'sine',.12);setTimeout(()=>tone(900,.15,'sine',.12),80);setT
 crash(){tone(80,.35,'sawtooth',.15);tone(150,.2,'square',.1);setTimeout(()=>tone(200,.15,'sawtooth',.08),150);},
 slide(){tone(300,.1,'sine',.06);tone(200,.15,'triangle',.05);setTimeout(()=>tone(150,.2,'sine',.04),100);},
 over(){tone(400,.18,'sawtooth',.1);setTimeout(()=>tone(300,.18,'sawtooth',.1),180);setTimeout(()=>tone(200,.35,'sawtooth',.1),360)},
-win(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.18,'square',.1),i*110))},rank(){tone(1200,.05,'square',.04);setTimeout(()=>tone(1400,.06,'square',.04),50)},close(){tone(900,.03);tone(1100,.03)},trash(){tone(80,.3,'sawtooth',.12);tone(120,.2,'square',.08)},sensor(){tone(1000,.06,'sine',.05)}};
+win(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.18,'square',.1),i*110))},rank(){tone(1200,.05,'square',.04);setTimeout(()=>tone(1400,.06,'square',.04),50)},close(){tone(900,.03);tone(1100,.03)},trash(){tone(80,.3,'sawtooth',.12);tone(120,.2,'square',.08)},creak(){tone(220,.08,'sawtooth',.06);tone(180,.15,'triangle',.04);setTimeout(()=>tone(150,.1,'sawtooth',.03),70);setTimeout(()=>tone(130,.12,'triangle',.02),140);},bodyFound(){tone(440,.1,'sawtooth',.08);setTimeout(()=>tone(520,.12,'sawtooth',.08),100);setTimeout(()=>tone(380,.18,'square',.09),220);}};
 function haptic(ms=50){try{navigator.vibrate&&navigator.vibrate(ms);}catch(e){}}
 
 let bgmI=null,bgmS=0,bgmT=280,bgmTgt=280;
@@ -192,7 +190,7 @@ let gs='title',map,pl,ens,pts,cans,timer,afxs,shake,codec,codect,disc,mvt,lt=0,m
 let styleScore=0,rankTimer=0,closeTimer=0,tbTimer=0,meowDecoy=null,idleTimer=0;
 let prevHC=-1,prevHT=-1,prevHS=-1,prevHM=-1;
 let combo=0,comboTimer=0,wasDetected=false,bulletTime=0,knockCount=0,goldenMouseGot=false;
-let sensorTimers={},trashedTiles={},bananas=[],clawFX=[]; // clawFX: {x,y,t,dir} slash vfx
+let trashedTiles={},bananas=[],clawFX=[];
 const START_TIME=60,MAX_TIME=120,MEOW_CD=5000,CLAW_CD=2500,CAN_BONUS=30;
 const BACKSTAB_STUN=5000,FRUSTRATION_DUR=1000;
 const BOX_MSGS=['又是個包裹？','這箱子昨天有嗎…','嗯...普通的箱子','快遞到了？'];
@@ -254,7 +252,19 @@ function meowR(x,y){for(let i=0;i<14;i++){const a=Math.PI*2*i/14;emit(x,y,'rgba(
 function sparkle(x,y){for(let i=0;i<8;i++)emit(x,y,'#FFD700',500,(Math.random()-.5)*2.5,(Math.random()-.5)*2.5-1,3);}
 function tSpark(x,y){for(let i=0;i<6;i++)emit(x,y,'#44ff88',600,(Math.random()-.5)*2,(Math.random()-1)*2,3);}
 function crashFX(x,y){for(let i=0;i<12;i++)emit(x,y,Math.random()>.5?'#fff':'#ffa500',600,(Math.random()-.5)*4,(Math.random()-.5)*4,5);}
-function showCodec(t,d){codec=t;codect=d;}
+function showCodec(t,d){
+  // Auto-calc minimum dwell time: ~320ms per character for Chinese, min 2200ms, max 5000ms
+  const autoMs=Math.max(2200,Math.min(5000,t.length*320+800));
+  const newDur=Math.max(autoMs,d||0);
+  // Protect the first 800ms of any currently-displaying message — queue-lite behavior
+  // (if two codecs fire back-to-back, the second one waits a moment instead of clobbering the first)
+  if(codect>0&&codect>(codec.length*320+800)-800){
+    // Current message has been shown for less than 800ms — delay the new one slightly
+    setTimeout(()=>{codec=t;codect=newDur;},Math.min(500,codect-200));
+    return;
+  }
+  codec=t;codect=newDur;
+}
 function showTB(s){const tp=$('tpop');tp.textContent=`+${s}s`;tp.classList.remove('show');void tp.offsetWidth;tp.classList.add('show');tbTimer=1300;sfx.timeUp();}
 function addStyle(p,r){styleScore+=p;const rp=$('rpop');rp.style.color=p>=25?'#ff2222':p>=15?'#ff8800':'#88ff88';rp.textContent=`+${p} ${r}`;rp.classList.add('show');rankTimer=1200;sfx.rank();}
 function speedMul(){return 1-cans.filter(c=>c.got).length*0.08;}
@@ -272,9 +282,9 @@ const spawns=[
 ens=spawns.map((s,i)=>{
   const t=typeAssign[i],g=GUARD_TYPES[t];
   return {x:s.x,y:s.y,vd:s.vd,pat:s.pat,pi:0,type:t,name:g.name,hat:g.hat,accent:g.accent,bs:g.bs,sightRange:g.sightRange,susMul:g.susMul,broadcastRange:g.broadcastRange,chaseSpeed:g.chaseSpeed,
-  mode:'patrol',ls:null,inv:0,mt:0,at:0,st:0,sus:0,turnT:0,slideVx:0,slideVy:0,slideT:0,petT:0,boxPause:0,stunType:0,scanT:0,scanDir:0,searchSteps:0};
+  mode:'patrol',ls:null,inv:0,mt:0,at:0,st:0,sus:0,turnT:0,slideVx:0,slideVy:0,slideT:0,petT:0,boxPause:0,stunType:0,scanT:0,scanDir:0,searchSteps:0,lastSpotted:null,lastSpottedAge:0,detourCD:0};
 });
-pts=[];afxs=[];meowDecoy=null;sensorTimers={};trashedTiles={};bananas=[];clawFX=[];
+pts=[];afxs=[];meowDecoy=null;trashedTiles={};bananas=[];clawFX=[];
 timer=START_TIME;mvt=0;meowCD=0;clawCD=0;codect=0;codec='';shake=0;styleScore=0;rankTimer=0;closeTimer=0;tbTimer=0;idleTimer=0;combo=0;comboTimer=0;wasDetected=false;bulletTime=0;knockCount=0;goldenMouseGot=false;bgmTgt=280;bgmT=280;prevHC=-1;prevHT=-1;prevHS=-1;prevHM=-1;
 showCodec('黑吉！背刺偷襲+金鼠加分！',3500);}
 
@@ -299,8 +309,30 @@ function updateAI(e,dt){
   if(e.st>0){e.st-=dt;return;}
   if(e.at>0)e.at-=dt;
 
+  // ── GLANCE: during patrol, briefly look 180° backward (punishes tailing) ──
+  if(e.glanceT>0){e.glanceT-=dt;if(e.glanceT<=0&&e.glanceVd!==undefined){e.vd=e.glanceVd;e.glanceVd=undefined;}
+    // While glancing, the flash cone rotates, allowing detection from behind.
+    // Still run the flash check below, but skip movement.
+  }
+
   const flash=getFlash(e),safe=isInSafe(pl.x,pl.y);
   let inC=false,inE=false;
+
+  // ── BODY DISCOVERY — seeing a stunned teammate triggers an alarm ──
+  if(e.mode!=='chase'&&!e.bodyAlerted){
+    const body=ens.find(a=>a!==e&&a.st>0&&flash.some(t=>t.x===a.x&&t.y===a.y));
+    if(body){
+      e.bodyAlerted=true;
+      e.mode='investigate';e.ls={x:body.x,y:body.y};e.inv=8000;e.sus=75;
+      sfx.bodyFound();shake=200;haptic(100);afxs.push({x:e.x,y:e.y,t:700});
+      showCodec(`「${e.name}：有人倒下了！全員集合！」`,2800);
+      // Global alert — all other non-stunned guards converge on the body
+      ens.forEach(a=>{if(a!==e&&a.st<=0&&a.slideT<=0){a.mode='investigate';a.ls={x:body.x,y:body.y};a.inv=8000;a.sus=Math.min(a.sus+40,75);a.bodyAlerted=true;}});
+      wasDetected=true; // counts as being 'noticed' for scoring
+    }
+  }
+  // Reset bodyAlerted once no one is stunned
+  if(!ens.some(a=>a.st>0))e.bodyAlerted=false;
   // Can see player? Not if hidden (box mode) — but box gets ? reaction
   const isBox=pl.hidden;
   if(!safe){
@@ -322,34 +354,50 @@ function updateAI(e,dt){
   const dist=Math.abs(e.x-pl.x)+Math.abs(e.y-pl.y);
   let hear=!isBox&&dist<=2&&inp.dir>=0;
   const dl=meowDecoy&&Math.abs(e.x-meowDecoy.x)+Math.abs(e.y-meowDecoy.y)<=8;
-  let sLure=null;for(const key in sensorTimers){if(sensorTimers[key]>0){const[sx,sy]=key.split(',').map(Number);if(Math.abs(e.x-sx)+Math.abs(e.y-sy)<=10)sLure={x:sx,y:sy};}}
   let tLure=null;for(const key in trashedTiles){const[tx2,ty2]=key.split(',').map(Number);if(Math.abs(e.x-tx2)+Math.abs(e.y-ty2)<=10)tLure={x:tx2,y:ty2};}
 
-  if(inC){e.sus=Math.min(e.sus+(inE?dt*.035:dt*.07)*(e.susMul||1),100);}else{if(e.mode!=='chase')e.sus=Math.max(e.sus-dt*.018,0);}
-  if(e.sus>=30&&e.sus<80&&e.mode==='patrol'){e.mode='suspect';sfx.suspect();e.vd=dirTo(e,pl.x,pl.y);e.turnT=1500;if(bulletTime<=0){bulletTime=400;$('btFlash').classList.add('show');haptic(80);}}
-  if(e.mode==='suspect'){e.turnT-=dt;if(e.sus>=80){e.mode='chase';e.ls={x:pl.x,y:pl.y};e.at=700;sfx.alert();afxs.push({x:e.x,y:e.y,t:700});shake=250;haptic(120);wasDetected=true;combo=0;
+  // ── INSTANT DETECTION (MGS-style): entering a cone = immediate chase, no ramp, no delay ──
+  if(inC&&(e.mode==='patrol'||e.mode==='investigate')){
+    e.mode='chase';e.ls={x:pl.x,y:pl.y};e.lastSpotted={x:pl.x,y:pl.y};e.lastSpottedAge=0;e.at=700;e.sus=100;
+    sfx.alert();afxs.push({x:e.x,y:e.y,t:700});shake=280;haptic(140);wasDetected=true;combo=0;
     // Broadcast — range depends on guard type; captain alerts the whole map
     const bRange=e.broadcastRange||8;
     const isCaptain=bRange>=999;
     if(isCaptain)showCodec(`「${e.name}呼叫全員！目標在 ${String.fromCharCode(65+pl.x%26)}${pl.y} 區！」`,2200);
-    ens.forEach(a=>{if(a!==e&&a.st<=0&&Math.abs(a.x-e.x)+Math.abs(a.y-e.y)<=bRange){a.mode='investigate';a.ls={x:pl.x,y:pl.y};a.inv=isCaptain?7000:5000;a.sus=Math.min(a.sus+(isCaptain?40:25),isCaptain?75:60);}});
-  }if(e.turnT<=0&&e.sus<80){e.mode='patrol';e.sus=Math.max(e.sus-15,0);}if(!inC&&e.turnT<=0){e.mode='patrol';e.sus=Math.max(e.sus-15,0);}return;}
-  if(inC&&e.mode==='chase'){e.ls={x:pl.x,y:pl.y};e.sus=100;e.inv=6000;}else if(e.mode==='chase'&&!inC){e.mode='investigate';e.inv=6000;}
+    ens.forEach(a=>{if(a!==e&&a.st<=0&&Math.abs(a.x-e.x)+Math.abs(a.y-e.y)<=bRange){a.mode='investigate';a.ls={x:pl.x,y:pl.y};a.lastSpotted={x:pl.x,y:pl.y};a.lastSpottedAge=0;a.inv=isCaptain?7000:5000;}});
+    // Punch bullet-time — gives player half a second to register "I'M CAUGHT, RUN"
+    if(bulletTime<=0){bulletTime=500;$('btFlash').classList.add('show');}
+  }
+  // Maintain chase while visible; escape to investigate on losing sight
+  if(inC&&e.mode==='chase'){e.ls={x:pl.x,y:pl.y};e.sus=100;e.inv=6000;e.lastSpotted={x:pl.x,y:pl.y};e.lastSpottedAge=0;}
+  else if(e.mode==='chase'&&!inC){e.mode='investigate';e.inv=6000;}
+  // Cosmetic sus decay for HUD bar continuity (no gameplay effect)
+  if(!inC&&e.mode==='patrol'&&e.sus>0)e.sus=Math.max(e.sus-dt*0.04,0);
 
   // ❤️ Meow lure → guard runs to spot then crouches (pets)
   if(dl&&e.mode!=='chase'){e.mode='investigate';e.ls={x:meowDecoy.x,y:meowDecoy.y};e.inv=6000;}
 
   if(tLure&&e.mode!=='chase'){e.mode='investigate';e.ls=tLure;e.inv=6000;}
-  if(sLure&&e.mode!=='chase'&&!tLure){e.mode='investigate';e.ls=sLure;e.inv=4000;}
   if(!inC&&hear&&e.mode==='patrol'&&!dl){e.mode='investigate';e.ls={x:pl.x,y:pl.y};e.inv=4000;sfx.suspect();}
   const claw=pts.filter(p=>{const px=Math.floor(p.x/T),py=Math.floor(p.y/T);return flash.some(t=>t.x===px&&t.y===py)&&typeof p.c==='string'&&p.c.includes('200,180,140');});
   if(claw.length>0&&e.mode==='patrol'){e.mode='investigate';e.ls={x:Math.floor(claw[0].x/T),y:Math.floor(claw[0].y/T)};e.inv=3500;}
   if(e.mode==='investigate'){e.inv-=dt;if(e.inv<=0){e.mode='patrol';e.ls=null;e.sus=Math.max(e.sus-20,0);e.scanT=0;e.searchSteps=0;}}
 
+  // ── MEMORY: lastSpotted decays over 25s; during patrol, guard occasionally revisits the hot zone ──
+  if(e.lastSpotted){e.lastSpottedAge+=dt;if(e.lastSpottedAge>25000){e.lastSpotted=null;e.lastSpottedAge=0;}}
+  if(e.detourCD>0)e.detourCD-=dt;
+  if(e.mode==='patrol'&&e.lastSpotted&&e.detourCD<=0){
+    const md=Math.abs(e.x-e.lastSpotted.x)+Math.abs(e.y-e.lastSpotted.y);
+    if(md>=2&&md<=11&&Math.random()<0.00022*dt){
+      e.mode='investigate';e.ls={x:e.lastSpotted.x,y:e.lastSpotted.y};e.inv=3500;
+      e.detourCD=14000;e.sus=Math.min(e.sus+10,40);
+      // Only voice it if player can plausibly notice the guard (nearby)
+      if(Math.abs(e.x-pl.x)+Math.abs(e.y-pl.y)<=7){showCodec(`「${e.name}回去剛才的地方看看...」`,1500);}
+    }
+  }
+
   const sm=speedMul(),cs=e.bs*sm;
-  // Sensor makes guards faster when active
-  let sensorBoost=1;for(const key in sensorTimers){if(sensorTimers[key]>0)sensorBoost=0.82;}
-  const spd=(e.mode==='chase'?cs*(e.chaseSpeed||0.48):e.mode==='investigate'?cs*.68:cs)*sensorBoost;
+  const spd=e.mode==='chase'?cs*(e.chaseSpeed||0.48):e.mode==='investigate'?cs*.68:cs;
 
   // ── Scan-in-place: head rotates 4 directions at investigate point ──
   if(e.scanT>0){e.scanT-=dt;
@@ -432,7 +480,7 @@ if(tbTimer>0){tbTimer-=dt;if(tbTimer<=0)$('tpop').classList.remove('show');}
 if(closeTimer>0)closeTimer-=dt;
 if(comboTimer>0){comboTimer-=dt;if(comboTimer<=0){combo=0;$('comboBox').classList.remove('show');}}
 if(pl.frustrationT>0)pl.frustrationT-=dt;
-updateBGM();for(const key in sensorTimers){sensorTimers[key]-=dt;if(sensorTimers[key]<=0)delete sensorTimers[key];}
+updateBGM();
 
 pl.hidden=inp.hide&&(map[pl.y]&&(map[pl.y][pl.x]===SH||map[pl.y][pl.x]===P||map[pl.y][pl.x]===CP)); // box works anywhere!
 if(inp.dir>=0)idleTimer=0;else idleTimer+=dt;
@@ -443,7 +491,6 @@ mvt-=dt;if(mvt<=0&&inp.dir>=0&&!pl.hidden&&pl.frustrationT<=0){
   const dd=[[0,-1],[0,1],[-1,0],[1,0]][inp.dir],nx=pl.x+dd[0],ny=pl.y+dd[1];pl.dir=inp.dir;
   if(nx>=0&&nx<CO&&ny>=0&&ny<RO){const t=map[ny][nx];const trashed=trashedTiles[nx+','+ny];
   if(t!==WL&&t!==PL&&!trashed){pl.x=nx;pl.y=ny;onCp?sfx.carpet():sfx.step();if(t===LF)leafB(nx,ny);
-  if(t===SN){const sk=nx+','+ny;if(!sensorTimers[sk]){sfx.sensor();sensorTimers[sk]=4000;showCodec('感應燈亮了！',1200);}}
   // Can
   const ch=cans.find(c=>c.x===nx&&c.y===ny&&!c.got);if(ch){ch.got=true;map[ny][nx]=P;sfx.can();sparkle(nx,ny);tSpark(nx,ny);timer=Math.min(timer+CAN_BONUS,MAX_TIME);showTB(CAN_BONUS);combo++;comboTimer=8000;const cb=combo>1?combo*5:0;addStyle(20+cb,combo>1?`x${combo} COMBO！`:'罐頭 GET！');if(combo>1){$('comboBox').textContent=`COMBO x${combo}`;$('comboBox').classList.add('show');}const left=cans.filter(c=>!c.got).length;showCodec(left?`續命！剩 ${left} 個`:'全收齊！衝出口！',2200);}
   // 🐁 GOLDEN MOUSE — big style bonus + small timer bonus, risky location
@@ -530,7 +577,6 @@ case PL:cx.fillStyle=((x+y)&1)?'#344426':'#3A4A2A';cx.fillRect(px,py,T,T);cx.fil
 case LT:cx.fillStyle='#4A5A38';cx.fillRect(px,py,T,T);break;
 case CP:cx.fillStyle=((x+y)&1)?'#5E3333':'#6B3A3A';cx.fillRect(px,py,T,T);break;
 case TR:cx.fillStyle=((x+y)&1)?'#344426':'#3A4A2A';cx.fillRect(px,py,T,T);cx.fillStyle='#666';cx.fillRect(px+8,py+6,16,22);cx.fillStyle='#888';cx.fillRect(px+6,py+4,20,4);cx.fillStyle='#555';cx.fillRect(px+10,py+10,4,14);cx.fillRect(px+18,py+10,4,14);cx.fillStyle='rgba(255,150,50,.35)';cx.font='7px "Press Start 2P"';cx.fillText('爪',px+6,py+30);break;
-case SN:cx.fillStyle=((x+y)&1)?'#344426':'#3A4A2A';cx.fillRect(px,py,T,T);const sk=x+','+y;const act=sensorTimers[sk]>0;cx.fillStyle=act?'rgba(255,255,200,.15)':'rgba(80,80,60,.05)';cx.fillRect(px,py,T,T);cx.fillStyle='#555';cx.fillRect(px+14,py+2,4,16);cx.fillStyle=act?'#FFEE88':'#554';cx.fillRect(px+10,py+0,12,6);if(act){cx.fillStyle='rgba(255,240,150,.12)';cx.beginPath();cx.arc(px+16,py+3,20,0,Math.PI*2);cx.fill();}break;
 case GM:{cx.fillStyle=((x+y)&1)?'#344426':'#3A4A2A';cx.fillRect(px,py,T,T);
   const mbob=Math.sin(Date.now()/280+x*2)*3,pulse=0.5+0.5*Math.sin(Date.now()/180);
   // Aura halo
@@ -659,7 +705,7 @@ if(e.boxPause>0){
 }
 // Normal guard — hat color varies by type
 cx.fillStyle='#8B6914';cx.fillRect(px+6,py+10,20,16);cx.fillStyle='#A0782C';cx.fillRect(px+4,py+4,24,14);cx.fillStyle='#C8A050';cx.fillRect(px+6,py+12,8,6);cx.fillRect(px+18,py+12,8,6);cx.fillStyle='#FFF';cx.fillRect(px+8,py+6,6,4);cx.fillRect(px+18,py+6,6,4);
-const ec=e.mode==='chase'?'#FF0000':e.mode==='suspect'?'#FFAA00':e.mode==='investigate'?'#FF8800':'#333';
+const ec=e.mode==='chase'?'#FF0000':e.mode==='investigate'?'#FF8800':'#333';
 cx.fillStyle=ec;cx.fillRect(px+10,py+7,3,2);cx.fillRect(px+20,py+7,3,2);if(e.mode==='chase'){cx.fillStyle='#5A3A00';cx.fillRect(px+8,py+4,6,2);cx.fillRect(px+18,py+4,6,2);}
 // Hat uses type color + lighter accent band
 cx.fillStyle=e.hat||'#1a1a3a';cx.fillRect(px+4,py+0,24,6);cx.fillRect(px+6,py-2,20,4);
@@ -674,11 +720,11 @@ cx.fillStyle='#888';const fhx=e.vd===3?px+26:e.vd===2?px-2:px+22,fhy=e.vd===0?py
 if(e.scanT>0){const sa=(1200-e.scanT)/1200;cx.fillStyle=`rgba(255,180,50,${0.6+0.4*Math.sin(Date.now()/100)})`;cx.font='bold 9px "Press Start 2P"';cx.fillText('👁',px+10,py-4);}
 // ❤️ when investigating meow
 if(e.mode==='investigate'&&meowDecoy){cx.fillStyle='#FF66AA';cx.font='10px "Press Start 2P"';cx.fillText('❤️',px+8,py-6);}
-if(e.mode==='suspect'&&e.st<=0){const p=.5+.5*Math.sin(Date.now()/120);cx.globalAlpha=p;cx.fillStyle='#FFAA00';cx.font='22px "Press Start 2P"';cx.fillText('?',px+8,py-10);cx.globalAlpha=1;}
+if(e.mode==='investigate'&&e.st<=0&&e.slideT<=0){const p=.5+.5*Math.sin(Date.now()/120);cx.globalAlpha=p;cx.fillStyle='#FFAA00';cx.font='22px "Press Start 2P"';cx.fillText('?',px+8,py-10);cx.globalAlpha=1;}
 if(e.sus>5&&e.mode!=='patrol'){cx.fillStyle=e.sus>=80?'#FF0000':e.sus>=30?'#FFAA00':'#88FF88';cx.fillRect(px+2,py-5,Math.round(e.sus/100*28),4);}
 const af=afxs.find(a=>a.x===e.x&&a.y===e.y);if(af){const sc=Math.min(1,af.t/350);cx.fillStyle='#FF0000';cx.font=`${26+14*sc}px "Press Start 2P"`;cx.fillText('!',px+6,py-16-14*(1-sc));}}
 
-function drawFlash(e){if(e.st>0||e.slideT>0||e.petT>0||e.boxPause>0)return;const flash=getFlash(e),set=new Set();flash.forEach(t=>set.add(t.y*CO+t.x));let fR=255,fG=230,fB=80,bR=255,bG=210,bB=50;if(e.mode==='chase'){fR=255;fG=80;fB=60;bR=255;bG=60;bB=40;}else if(e.mode==='suspect'||e.mode==='investigate'){fR=255;fG=180;fB=50;bR=255;bG=160;bB=30;}const fl=(e.mode==='suspect')?(.7+.3*Math.sin(Date.now()/60)):1;flash.forEach(t=>{const alpha=Math.max(.06,.30-t.dist*.025)*fl;cx.fillStyle=`rgba(${fR},${fG},${fB},${alpha})`;cx.fillRect(t.x*T,t.y*T,T,T);cx.strokeStyle=`rgba(${bR},${bG},${bB},${.45*fl})`;cx.lineWidth=1.5;if(!set.has((t.y-1)*CO+t.x)){cx.beginPath();cx.moveTo(t.x*T,t.y*T);cx.lineTo(t.x*T+T,t.y*T);cx.stroke();}if(!set.has((t.y+1)*CO+t.x)){cx.beginPath();cx.moveTo(t.x*T,t.y*T+T);cx.lineTo(t.x*T+T,t.y*T+T);cx.stroke();}if(!set.has(t.y*CO+(t.x-1))){cx.beginPath();cx.moveTo(t.x*T,t.y*T);cx.lineTo(t.x*T,t.y*T+T);cx.stroke();}if(!set.has(t.y*CO+(t.x+1))){cx.beginPath();cx.moveTo(t.x*T+T,t.y*T);cx.lineTo(t.x*T+T,t.y*T+T);cx.stroke();}});}
+function drawFlash(e){if(e.st>0||e.slideT>0||e.petT>0||e.boxPause>0)return;const flash=getFlash(e),set=new Set();flash.forEach(t=>set.add(t.y*CO+t.x));let fR=255,fG=230,fB=80,bR=255,bG=210,bB=50;if(e.mode==='chase'){fR=255;fG=80;fB=60;bR=255;bG=60;bB=40;}else if(e.mode==='investigate'){fR=255;fG=180;fB=50;bR=255;bG=160;bB=30;}const fl=e.mode==='investigate'?(.7+.3*Math.sin(Date.now()/80)):e.mode==='chase'?(.85+.15*Math.sin(Date.now()/50)):1;flash.forEach(t=>{const alpha=Math.max(.06,.30-t.dist*.025)*fl;cx.fillStyle=`rgba(${fR},${fG},${fB},${alpha})`;cx.fillRect(t.x*T,t.y*T,T,T);cx.strokeStyle=`rgba(${bR},${bG},${bB},${.45*fl})`;cx.lineWidth=1.5;if(!set.has((t.y-1)*CO+t.x)){cx.beginPath();cx.moveTo(t.x*T,t.y*T);cx.lineTo(t.x*T+T,t.y*T);cx.stroke();}if(!set.has((t.y+1)*CO+t.x)){cx.beginPath();cx.moveTo(t.x*T,t.y*T+T);cx.lineTo(t.x*T+T,t.y*T+T);cx.stroke();}if(!set.has(t.y*CO+(t.x-1))){cx.beginPath();cx.moveTo(t.x*T,t.y*T);cx.lineTo(t.x*T,t.y*T+T);cx.stroke();}if(!set.has(t.y*CO+(t.x+1))){cx.beginPath();cx.moveTo(t.x*T+T,t.y*T);cx.lineTo(t.x*T+T,t.y*T+T);cx.stroke();}});}
 
 function drawDecoy(){if(!meowDecoy)return;const px=meowDecoy.x*T,py=meowDecoy.y*T,p=.3+.4*Math.sin(Date.now()/120);cx.strokeStyle=`rgba(255,100,150,${p*.6})`;cx.lineWidth=1.5;const r=8+Math.sin(Date.now()/200)*4;for(let i=0;i<3;i++){cx.beginPath();cx.arc(px+T/2,py+T/2,r+i*7,0,Math.PI*2);cx.stroke();}cx.fillStyle=`rgba(255,100,150,${p})`;cx.font='10px "Press Start 2P"';cx.fillText('♡',px+10,py+T/2+4);}
 function drawBananas(){bananas.forEach(b=>{const px=b.x*T,py=b.y*T;cx.fillStyle='#FFD700';cx.fillRect(px+10,py+12,12,4);cx.fillRect(px+8,py+14,4,6);cx.fillRect(px+20,py+10,4,6);cx.fillStyle='#AA8800';cx.fillRect(px+14,py+16,4,4);});}
@@ -724,7 +770,41 @@ function drawClawFX(){clawFX.forEach(f=>{
 function drawTrashed(){for(const key in trashedTiles){const[tx,ty]=key.split(',').map(Number),px=tx*T,py=ty*T;cx.fillStyle='#555';cx.fillRect(px+2,py+12,12,6);cx.fillRect(px+16,py+16,10,4);cx.fillStyle='#444';cx.fillRect(px+10,py+22,14,4);}}
 function drawFog(){const vis=new Set();pVis().forEach(t=>vis.add(t.y*CO+t.x));for(let y=0;y<RO;y++)for(let x=0;x<CO;x++){if(vis.has(y*CO+x))continue;if(map[y][x]===PL&&disc[y][x]){cx.fillStyle='rgba(8,8,8,.40)';cx.fillRect(x*T,y*T,T,T);continue;}cx.fillStyle=disc[y][x]?'rgba(8,8,8,.65)':'#030303';cx.fillRect(x*T,y*T,T,T);}pVis().forEach(t=>{const d=Math.sqrt((t.x-pl.x)**2+(t.y-pl.y)**2);if(d>3.5){cx.fillStyle=`rgba(8,8,8,${Math.min((d-3.5)/2.5*.40,.40)})`;cx.fillRect(t.x*T,t.y*T,T,T);}});}
 function drawPts(){pts.forEach(p=>{cx.globalAlpha=p.l/p.ml;cx.fillStyle=p.c;cx.fillRect(p.x-p.s/2,p.y-p.s/2,p.s,p.s);});cx.globalAlpha=1;}
-function drawCodec(){if(codect<=0)return;cx.globalAlpha=Math.min(1,codect/400);const bw=MW-40,bx=20,by=MH-50;cx.fillStyle='rgba(0,20,10,.88)';cx.fillRect(bx,by,bw,38);cx.strokeStyle='#00FF88';cx.lineWidth=2;cx.strokeRect(bx,by,bw,38);cx.fillStyle='#222';cx.fillRect(bx+6,by+8,18,18);cx.fillStyle='#FFDD00';cx.fillRect(bx+10,by+14,4,4);cx.fillRect(bx+16,by+14,4,4);cx.fillStyle='#00FF88';cx.font='8px "Press Start 2P"';const mc=Math.floor((bw-36)/7);cx.fillText(codec.substring(0,mc),bx+30,by+18);if(codec.length>mc)cx.fillText(codec.substring(mc),bx+30,by+30);cx.globalAlpha=1;}
+function drawCodec(){if(codect<=0)return;
+  cx.globalAlpha=Math.min(1,codect/400);
+  const bw=MW-30,bx=15,bh=78,by=MH-bh-8;
+  // Drop shadow
+  cx.fillStyle='rgba(0,0,0,.7)';cx.fillRect(bx+4,by+4,bw,bh);
+  // Main dialog box
+  cx.fillStyle='rgba(0,15,5,.95)';cx.fillRect(bx,by,bw,bh);
+  // Double border
+  cx.strokeStyle='#00FF88';cx.lineWidth=3;cx.strokeRect(bx,by,bw,bh);
+  cx.strokeStyle='rgba(255,215,0,.35)';cx.lineWidth=1;cx.strokeRect(bx+4,by+4,bw-8,bh-8);
+  cx.lineWidth=1;
+  // Cat portrait — scaled up to match bigger box
+  const px0=bx+12,py0=by+14;
+  cx.fillStyle='#1a1a1a';cx.fillRect(px0,py0,48,48);
+  cx.fillStyle='#2a2a2a';cx.fillRect(px0+3,py0+3,42,42);
+  // Ears
+  cx.fillStyle='#1a1a1a';cx.fillRect(px0+3,py0-6,9,11);cx.fillRect(px0+36,py0-6,9,11);
+  // Glowing yellow eyes
+  const pulse=.8+.2*Math.sin(Date.now()/200);
+  cx.fillStyle=`rgba(255,221,0,${pulse})`;
+  cx.fillRect(px0+10,py0+16,9,7);cx.fillRect(px0+29,py0+16,9,7);
+  cx.fillStyle='#000';cx.fillRect(px0+13,py0+18,3,4);cx.fillRect(px0+32,py0+18,3,4);
+  // Tiny pink nose
+  cx.fillStyle='#FF88AA';cx.fillRect(px0+22,py0+28,4,3);
+  // Text — 22px canvas units = roughly 10-11px on phone, ~22px on desktop
+  cx.fillStyle='#FFFFFF';
+  cx.font='bold 22px "Noto Sans TC",sans-serif';
+  const textX=bx+72,maxW=bw-84;
+  const charsPerLine=Math.floor(maxW/23);
+  const line1=codec.substring(0,charsPerLine);
+  const line2=codec.length>charsPerLine?codec.substring(charsPerLine,charsPerLine*2):'';
+  cx.fillText(line1,textX,by+32);
+  if(line2)cx.fillText(line2,textX,by+60);
+  cx.globalAlpha=1;
+}
 function drawHUD(){const got=cans.filter(c=>c.got).length,t=Math.ceil(timer),mcd=Math.ceil(meowCD/1000);if(got!==prevHC){prevHC=got;$('canBox').innerHTML=`🥫 <b style="color:#fff;font-size:14px">${got}</b>/3`;}if(t!==prevHT){prevHT=t;$('timerBox').textContent=t;}$('timerBox').style.color=timer<=15?(Math.sin(Date.now()/200)>.3?'#ff2222':'#ff8844'):'#ff6644';if(styleScore!==prevHS){prevHS=styleScore;$('scoreBox').textContent=`⭐ ${styleScore}`;}
 // Meow CD
 if(mcd!==prevHM){prevHM=mcd;const mb=$('bMeow');if(meowCD>0){mb.classList.add('cd');let ov=mb.querySelector('.cdov');if(!ov){ov=document.createElement('span');ov.className='cdov';mb.appendChild(ov);}ov.textContent=mcd+'s';}else{mb.classList.remove('cd');const ov=mb.querySelector('.cdov');if(ov)ov.remove();}}
@@ -1050,7 +1130,7 @@ function drawWinCat(dt){if(!winCV)return;const w=winCV.width,h=winCV.height,ctx=
 function showOv(){const ov=$('ov'),ct=$('ovc');ov.classList.remove('hide');
 if(ovLastState===gs)return; // only rebuild DOM on state transition
 ovLastState=gs;
-if(gs==='title'){const best=getBest();ct.innerHTML=`<canvas id="eyeC" width="240" height="90" style="display:block;margin:0 auto 8px;image-rendering:auto;"></canvas><h1>天玉街の黑吉</h1><h2>— 貓 爪 伏 擊 版 —</h2>${best?`<p class="best">🏆 最高：${best}分</p>`:''}<div class="sinfo"><p><span class="k">📦</span> 紙箱偽裝 — 任何地方隱身</p><p><span class="k">🐾</span> 貓爪 — 🥷 背刺保全！2.5s CD</p><p><span class="k">😻</span> 喵叫 — ❤️ 引保全蹲下摸貓</p></div><p class="tip">🐁 黃金老鼠 — 拿到 +50分 +10秒（位置危險！）</p><p class="tip">👮 4 種保全：🟢新人 🔵老陳 🟠阿勇 🟣隊長</p><p class="tip">⚠️ 隊長發現你會廣播全員！</p><p class="tip">🥷 相鄰+視線外=大暈眩5秒｜正面=硬直1秒</p><p class="tip">🗑️ 面對垃圾桶按爪→香蕉皮→保全滑壘</p><p class="tip">🌺 盆栽旁=SAFE ｜ 💡 感應燈=保全加速</p><p class="tip">⌨️ 方向鍵/WASD 移動 ｜ <b style="color:#ffcc66">SPACE=爪</b> SHIFT=箱 E=喵</p><p class="tip">📱 左下方向鍵 D-pad ｜ 右下技能按鈕</p><p class="tip" style="color:#ffcc66">🎮 按 SPACE / ENTER 開始</p><div class="btn" id="startBtn">開始偷襲</div>`;eyeCV=$('eyeC');eyeCX=eyeCV.getContext('2d');tcX=eyeCV.width+30;tcFrame=0;tcFrameT=0;tcPause=0;tcPauseMax=0;tcPassed=false;tcBlink=0;tcBlinkT=0;tcNextBlink=1800;$('startBtn').addEventListener('click',startGame);$('startBtn').addEventListener('touchend',e=>{e.preventDefault();startGame();});}
+if(gs==='title'){const best=getBest();ct.innerHTML=`<canvas id="eyeC" width="240" height="90" style="display:block;margin:0 auto 8px;image-rendering:auto;"></canvas><h1>天玉街の黑吉</h1><h2>— 貓 爪 伏 擊 版 —</h2>${best?`<p class="best">🏆 最高：${best}分</p>`:''}<div class="sinfo"><p><span class="k">📦</span> 紙箱偽裝 — 任何地方隱身</p><p><span class="k">🐾</span> 貓爪 — 🥷 背刺保全！2.5s CD</p><p><span class="k">😻</span> 喵叫 — ❤️ 引保全蹲下摸貓</p></div><p class="tip">🐁 黃金老鼠 — 拿到 +50分 +10秒（位置危險！）</p><p class="tip">👮 4 種保全：🟢新人 🔵老陳 🟠阿勇 🟣隊長</p><p class="tip">⚠️ 隊長發現你會廣播全員！</p><p class="tip">🥷 相鄰+視線外=大暈眩5秒｜正面=硬直1秒</p><p class="tip">🗑️ 面對垃圾桶按爪→香蕉皮→保全滑壘</p><p class="tip">🌺 盆栽旁=SAFE ｜ 🧠 保全會記住你，偶爾回去探查</p><p class="tip">⌨️ 方向鍵/WASD 移動 ｜ <b style="color:#ffcc66">SPACE=爪</b> SHIFT=箱 E=喵</p><p class="tip">📱 左下方向鍵 D-pad ｜ 右下技能按鈕</p><p class="tip" style="color:#ffcc66">🎮 按 SPACE / ENTER 開始</p><div class="btn" id="startBtn">開始偷襲</div>`;eyeCV=$('eyeC');eyeCX=eyeCV.getContext('2d');tcX=eyeCV.width+30;tcFrame=0;tcFrameT=0;tcPause=0;tcPauseMax=0;tcPassed=false;tcBlink=0;tcBlinkT=0;tcNextBlink=1800;$('startBtn').addEventListener('click',startGame);$('startBtn').addEventListener('touchend',e=>{e.preventDefault();startGame();});}
 else if(gs==='gameover'){const got=cans.filter(c=>c.got).length;ct.innerHTML=`<h1>被抓到了！</h1><h2>黑吉被保全逮住了...</h2><p style="font-size:12px;color:#ccc;">🥫 ${got}/3 ⭐ ${styleScore}分 🐾 伏擊${knockCount}次</p><div class="btn" id="retryBtn">再試一次</div>`;$('retryBtn').addEventListener('click',startGame);$('retryBtn').addEventListener('touchend',e=>{e.preventDefault();startGame();});}
 else if(gs==='win'){let g='C';if(styleScore>=150)g='S+';else if(styleScore>=100)g='S';else if(styleScore>=60)g='A';else if(styleScore>=30)g='B';
 let title='';
