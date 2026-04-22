@@ -156,10 +156,12 @@ const PLANTER_SLOTS=[{x:6,y:1},{x:20,y:2},{x:8,y:5},{x:23,y:6},{x:6,y:9},{x:16,y
 const TRASH_POS=[{x:12,y:5},{x:6,y:11},{x:18,y:15},{x:10,y:3}];
 // Golden mouse: only spawns in deep corners or near patrols (high-risk = high-reward)
 const GOLDEN_MOUSE_SLOTS=[{x:13,y:4},{x:25,y:11},{x:14,y:17},{x:1,y:19},{x:25,y:1},{x:9,y:13}];
-const EXIT_POS={x:24,y:19};
+// Exit candidates — all in upper/mid map (y ≤ 12) to avoid being hidden by codec dialog at bottom
+const EXIT_SLOTS=[{x:25,y:1},{x:2,y:5},{x:17,y:4},{x:6,y:12},{x:25,y:11},{x:13,y:8},{x:5,y:7},{x:19,y:1}];
+let chosenExit=null; // set when all cans collected
 
 function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
-function buildMap(){const m=BASE_MAP.map(r=>[...r]);m[EXIT_POS.y][EXIT_POS.x]=EX;
+function buildMap(){const m=BASE_MAP.map(r=>[...r]);
 shuffle(CAN_SLOTS).slice(0,3).forEach(c=>{if(m[c.y][c.x]!==WL)m[c.y][c.x]=CN;});
 shuffle(PLANTER_SLOTS).slice(0,6).forEach(p=>{if(m[p.y][p.x]===P||m[p.y][p.x]===LF)m[p.y][p.x]=PL;});
 TRASH_POS.forEach(t=>{if(m[t.y][t.x]===P)m[t.y][t.x]=TR;});
@@ -285,7 +287,7 @@ ens=spawns.map((s,i)=>{
   mode:'patrol',ls:null,inv:0,mt:0,at:0,st:0,sus:0,turnT:0,slideVx:0,slideVy:0,slideT:0,petT:0,boxPause:0,stunType:0,scanT:0,scanDir:0,searchSteps:0,lastSpotted:null,lastSpottedAge:0,detourCD:0};
 });
 pts=[];afxs=[];meowDecoy=null;trashedTiles={};bananas=[];clawFX=[];
-timer=START_TIME;mvt=0;meowCD=0;clawCD=0;codect=0;codec='';shake=0;styleScore=0;rankTimer=0;closeTimer=0;tbTimer=0;idleTimer=0;combo=0;comboTimer=0;wasDetected=false;bulletTime=0;knockCount=0;goldenMouseGot=false;bgmTgt=280;bgmT=280;prevHC=-1;prevHT=-1;prevHS=-1;prevHM=-1;
+timer=START_TIME;mvt=0;meowCD=0;clawCD=0;codect=0;codec='';shake=0;styleScore=0;rankTimer=0;closeTimer=0;tbTimer=0;idleTimer=0;combo=0;comboTimer=0;wasDetected=false;bulletTime=0;knockCount=0;goldenMouseGot=false;chosenExit=null;bgmTgt=280;bgmT=280;prevHC=-1;prevHT=-1;prevHS=-1;prevHM=-1;
 showCodec('黑吉！背刺偷襲+金鼠加分！',3500);}
 
 // ══════════════════
@@ -492,7 +494,38 @@ mvt-=dt;if(mvt<=0&&inp.dir>=0&&!pl.hidden&&pl.frustrationT<=0){
   if(nx>=0&&nx<CO&&ny>=0&&ny<RO){const t=map[ny][nx];const trashed=trashedTiles[nx+','+ny];
   if(t!==WL&&t!==PL&&!trashed){pl.x=nx;pl.y=ny;onCp?sfx.carpet():sfx.step();if(t===LF)leafB(nx,ny);
   // Can
-  const ch=cans.find(c=>c.x===nx&&c.y===ny&&!c.got);if(ch){ch.got=true;map[ny][nx]=P;sfx.can();sparkle(nx,ny);tSpark(nx,ny);timer=Math.min(timer+CAN_BONUS,MAX_TIME);showTB(CAN_BONUS);combo++;comboTimer=8000;const cb=combo>1?combo*5:0;addStyle(20+cb,combo>1?`x${combo} COMBO！`:'罐頭 GET！');if(combo>1){$('comboBox').textContent=`COMBO x${combo}`;$('comboBox').classList.add('show');}const left=cans.filter(c=>!c.got).length;showCodec(left?`續命！剩 ${left} 個`:'全收齊！衝出口！',2200);}
+  const ch=cans.find(c=>c.x===nx&&c.y===ny&&!c.got);if(ch){ch.got=true;map[ny][nx]=P;sfx.can();sparkle(nx,ny);tSpark(nx,ny);timer=Math.min(timer+CAN_BONUS,MAX_TIME);showTB(CAN_BONUS);combo++;comboTimer=8000;const cb=combo>1?combo*5:0;addStyle(20+cb,combo>1?`x${combo} COMBO！`:'罐頭 GET！');if(combo>1){$('comboBox').textContent=`COMBO x${combo}`;$('comboBox').classList.add('show');}
+    const left=cans.filter(c=>!c.got).length;
+    if(left){showCodec(`續命！剩 ${left} 個`,2200);}
+    else{
+      // ── ALL CANS COLLECTED → spawn exit at a random valid upper-map slot ──
+      const valid=shuffle(EXIT_SLOTS).filter(s=>{
+        // Must be floor/leaf/carpet (not wall, not planter, not another entity tile)
+        const tt=map[s.y][s.x];
+        if(tt!==P&&tt!==LF&&tt!==CP&&tt!==LT)return false;
+        // Must not be the cat's current location
+        if(s.x===pl.x&&s.y===pl.y)return false;
+        // Must not be a guard's current location
+        if(ens.some(e=>e.x===s.x&&e.y===s.y))return false;
+        return true;
+      });
+      if(valid.length){
+        chosenExit=valid[0];
+        map[chosenExit.y][chosenExit.x]=EX;
+        // Burst of light particles at the spawn point
+        for(let i=0;i<30;i++){const a=Math.PI*2*i/30;emit(chosenExit.x,chosenExit.y,'#44ffaa',1600,Math.cos(a)*2.5,Math.sin(a)*2.5,5);}
+        // Also burst at player to show the connection
+        for(let i=0;i<10;i++)emit(pl.x,pl.y,'#44ffaa',1000,(Math.random()-.5)*2,(Math.random()-.5)*2,3);
+        shake=200;haptic(120);sfx.win();
+        showCodec('全部收齊！出口出現了！快逃！',3500);
+      }else{
+        // Extreme edge case — fall back to a known-clear tile
+        chosenExit={x:25,y:1};
+        map[1][25]=EX;
+        showCodec('全部收齊！出口出現了！',3500);
+      }
+    }
+  }
   // 🐁 GOLDEN MOUSE — big style bonus + small timer bonus, risky location
   if(t===GM&&!goldenMouseGot){goldenMouseGot=true;map[ny][nx]=P;sfx.can();sfx.meow();sparkle(nx,ny);sparkle(nx,ny);tSpark(nx,ny);for(let i=0;i<20;i++)emit(nx,ny,'#FFD700',900,(Math.random()-.5)*3,(Math.random()-1.2)*2.2,4);timer=Math.min(timer+10,MAX_TIME);showTB(10);addStyle(50,'🐁 黃金老鼠！');shake=150;haptic(80);showCodec('老鼠玩具！傳說中的神器！',2200);}
   if(t===EX&&cans.every(c=>c.got)){gs='win';sfx.win();stopBGM();const b=getBest();if(styleScore>b)setBest(styleScore);}
@@ -570,7 +603,29 @@ function drawTile(x,y,t){const px=x*T,py=y*T;switch(t){
 case P:cx.fillStyle=((x+y)&1)?'#344426':'#3A4A2A';cx.fillRect(px,py,T,T);break;
 case WL:cx.fillStyle='#5C2A2A';cx.fillRect(px,py,T,T);cx.fillStyle='#4A1E1E';cx.fillRect(px,py,T,1);cx.fillRect(px,py+T/2,T,1);if(y&1){cx.fillRect(px+T/2,py,1,T/2);cx.fillRect(px,py+T/2,1,T/2);}else{cx.fillRect(px,py,1,T/2);cx.fillRect(px+T/2,py+T/2,1,T/2);}cx.fillStyle='#6B3535';cx.fillRect(px+2,py+2,T-4,2);cx.fillStyle='rgba(0,0,0,.35)';cx.fillRect(px+T-2,py,2,T);cx.fillRect(px,py+T-2,T,2);break;
 case CN:cx.fillStyle=((x+y)&1)?'#344426':'#3A4A2A';cx.fillRect(px,py,T,T);const bob=Math.sin(Date.now()/280+x*3)*2.5;cx.fillStyle='#B89800';cx.fillRect(px+7,py+7+bob,18,18);cx.fillStyle='#FFD700';cx.fillRect(px+9,py+9+bob,14,14);cx.fillStyle='#FFF';cx.fillRect(px+11,py+10+bob,4,3);cx.fillStyle='rgba(255,215,0,.22)';cx.beginPath();cx.arc(px+16,py+16+bob,16,0,Math.PI*2);cx.fill();cx.fillStyle='rgba(68,255,136,.55)';cx.font='bold 7px "Press Start 2P"';cx.fillText('+30s',px+3,py+30+bob);break;
-case EX:cx.fillStyle='#3A4A2A';cx.fillRect(px,py,T,T);const pu=.5+.5*Math.sin(Date.now()/200);cx.fillStyle=`rgba(0,255,100,${.1+pu*.15})`;cx.fillRect(px,py,T,T);cx.fillStyle='#00CC66';cx.fillRect(px+3,py+3,T-6,T-6);cx.fillStyle='#FFF';cx.font='bold 9px "Press Start 2P"';cx.fillText('EXIT',px+1,py+20);break;
+case EX:{
+  cx.fillStyle='#3A4A2A';cx.fillRect(px,py,T,T);
+  const pu=.5+.5*Math.sin(Date.now()/180);
+  // Outer halo — extends beyond the tile to make it unmissable
+  const halo=cx.createRadialGradient(px+T/2,py+T/2,2,px+T/2,py+T/2,T*1.5);
+  halo.addColorStop(0,`rgba(100,255,180,${0.35+pu*0.25})`);
+  halo.addColorStop(0.5,`rgba(60,220,140,${0.15+pu*0.15})`);
+  halo.addColorStop(1,'rgba(0,255,100,0)');
+  cx.fillStyle=halo;cx.fillRect(px-T,py-T,T*3,T*3);
+  // Pulsing tile background
+  cx.fillStyle=`rgba(0,255,140,${0.25+pu*0.35})`;cx.fillRect(px,py,T,T);
+  // Main portal body
+  cx.fillStyle='#00CC66';cx.fillRect(px+3,py+3,T-6,T-6);
+  cx.fillStyle=`rgba(255,255,255,${0.3+pu*0.5})`;cx.fillRect(px+6,py+6,T-12,T-12);
+  // Bright EXIT text with shadow
+  cx.fillStyle='rgba(0,0,0,0.6)';cx.font='bold 9px "Press Start 2P"';cx.fillText('EXIT',px+2,py+21);
+  cx.fillStyle='#FFFFFF';cx.fillText('EXIT',px+1,py+20);
+  // Ascending sparkle particles
+  for(let i=0;i<3;i++){const a=Date.now()/300+i*2.09,sx=px+T/2+Math.cos(a)*(T/2-4),sy=py+T/2+Math.sin(a)*(T/2-4);cx.fillStyle=`rgba(255,255,200,${pu*0.9})`;cx.fillRect(sx,sy,2,2);}
+  // Upward-flowing arrow hint (only visible when exit is active)
+  cx.fillStyle=`rgba(255,255,255,${0.4+pu*0.4})`;
+  cx.fillRect(px+14,py-4,4,3);cx.fillRect(px+12,py-2,8,1);
+  break;}
 case SH:cx.fillStyle='#1E2A14';cx.fillRect(px,py,T,T);cx.fillStyle='rgba(0,0,0,.3)';cx.fillRect(px+2,py+2,T-4,T-4);break;
 case LF:cx.fillStyle=((x+y)&1)?'#344426':'#3A4A2A';cx.fillRect(px,py,T,T);cx.fillStyle='#5A7A3A';for(let i=0;i<4;i++)cx.fillRect(px+5+(i*7)%16,py+10+(i*5)%12,6,4);break;
 case PL:cx.fillStyle=((x+y)&1)?'#344426':'#3A4A2A';cx.fillRect(px,py,T,T);cx.fillStyle='#CC4422';cx.fillRect(px+3,py+16,26,12);cx.fillStyle='#DD5533';cx.fillRect(px+5,py+14,22,4);cx.fillStyle='#33CC33';cx.fillRect(px+2,py+4,28,12);cx.fillStyle='#22AA22';cx.fillRect(px+6,py+2,20,6);cx.fillStyle='#FF2222';cx.fillRect(px+8,py+3,5,5);cx.fillRect(px+19,py+5,5,5);cx.fillStyle='#FFDD00';cx.fillRect(px+9,py+4,3,3);cx.fillRect(px+20,py+6,3,3);cx.fillStyle='#FF66AA';cx.fillRect(px+14,py+1,4,4);const sg=.25+.15*Math.sin(Date.now()/700);cx.fillStyle=`rgba(0,255,100,${sg*.10})`;cx.fillRect(px-T,py-T,T*3,T*3);break;
