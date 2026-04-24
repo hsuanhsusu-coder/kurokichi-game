@@ -66,6 +66,19 @@ canvas#c{display:block;image-rendering:pixelated;image-rendering:crisp-edges;}
 .tip{font-size:9px;color:#88ff88;line-height:1.8;margin-top:3px;}
 .best{font-size:11px;color:#ff8800;margin-top:5px;}
 .title-tag{font-size:11px;color:#ff44ff;margin:5px 0;}
+/* Collapsible sections on title screen */
+.panel{margin:10px auto;max-width:460px;text-align:left;}
+.panel-head{cursor:pointer;padding:8px 12px;background:rgba(240,192,64,.12);border:1px solid rgba(240,192,64,.35);color:#f0c040;font:11px 'Press Start 2P',monospace;display:flex;align-items:center;justify-content:space-between;border-radius:3px;user-select:none;}
+.panel-head:hover{background:rgba(240,192,64,.22);}
+.panel-head .arr{font-size:10px;transition:transform .2s;}
+.panel.open .panel-head .arr{transform:rotate(90deg);}
+.panel-body{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease;background:rgba(0,0,0,.4);border-left:1px solid rgba(240,192,64,.2);border-right:1px solid rgba(240,192,64,.2);border-bottom:1px solid rgba(240,192,64,.2);padding:0 12px;}
+.panel.open .panel-body{max-height:500px;padding:10px 12px;}
+/* Story narrative styling */
+.story-beat{font-size:10px;color:#e8e0c8;line-height:1.9;margin:6px 0;padding-left:6px;border-left:2px solid rgba(240,192,64,.4);}
+.story-beat b{color:#f0c040;}
+.ending-line{font-size:11px;color:#e8e0c8;line-height:1.7;margin:6px 0;font-style:italic;}
+.ending-line.secret{color:#ff88ff;text-shadow:0 0 8px rgba(255,136,255,.4);}
 #rpop{position:fixed;top:46px;left:50%;transform:translateX(-50%);z-index:25;font:15px 'Press Start 2P',monospace;text-shadow:0 0 10px currentColor,0 2px 4px rgba(0,0,0,.8);opacity:0;transition:opacity .15s;pointer-events:none;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis;}
 #rpop.show{opacity:1;}
 #tpop{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:25;font:18px 'Press Start 2P',monospace;color:#44ff88;text-shadow:0 0 12px #00ff66,0 2px 4px rgba(0,0,0,.8);opacity:0;pointer-events:none;}
@@ -73,6 +86,27 @@ canvas#c{display:block;image-rendering:pixelated;image-rendering:crisp-edges;}
 @keyframes floatUp{0%{opacity:1;transform:translateX(-50%) translateY(0);}70%{opacity:1;}100%{opacity:0;transform:translateX(-50%) translateY(-36px);}}
 #btFlash{position:fixed;inset:0;z-index:15;pointer-events:none;opacity:0;transition:opacity .1s;background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,80,.25) 100%);border:3px solid rgba(100,150,255,.3);}
 #btFlash.show{opacity:1;}
+/* Story banner — top of canvas, semi-transparent, doesn't block gameplay */
+#banner{position:fixed;top:40px;left:50%;transform:translateX(-50%);z-index:35;max-width:88%;padding:6px 12px;background:linear-gradient(90deg,rgba(15,10,5,.55) 0%,rgba(20,15,8,.85) 20%,rgba(20,15,8,.85) 80%,rgba(15,10,5,.55) 100%);border-top:2px solid rgba(240,192,64,.6);border-bottom:2px solid rgba(240,192,64,.6);display:none;align-items:center;gap:10px;pointer-events:none;animation:bannerIn .28s ease;}
+#banner.show{display:flex;}
+#banner.out{animation:bannerOut .28s ease forwards;}
+@keyframes bannerIn{from{opacity:0;transform:translate(-50%,-10px);}to{opacity:1;transform:translate(-50%,0);}}
+@keyframes bannerOut{from{opacity:1;}to{opacity:0;transform:translate(-50%,-6px);}}
+.bnFace{width:24px;height:24px;flex-shrink:0;border-radius:3px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.bnText{font:bold 12px "Noto Sans TC",sans-serif;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:1px 1px 0 #000,0 0 4px rgba(0,0,0,.8);}
+.bnText b{color:#ffd760;}
+/* Cutscene dialog overlay */
+#cutscene{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center;padding-bottom:24px;animation:csFadeIn .25s ease;}
+#cutscene.show{display:flex;}
+@keyframes csFadeIn{from{opacity:0;}to{opacity:1;}}
+.csBox{background:linear-gradient(180deg,#18100a 0%,#0a0806 100%);border:3px solid #f0c040;border-radius:8px;padding:16px 18px;max-width:620px;width:92%;display:flex;gap:14px;align-items:flex-start;box-shadow:0 4px 24px rgba(0,0,0,.8),inset 0 0 20px rgba(240,192,64,.08);animation:csSlideUp .3s ease;}
+@keyframes csSlideUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.csFace{width:72px;height:72px;border:2px solid #f0c040;border-radius:4px;background:#1a1a1a;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.csFace canvas{image-rendering:pixelated;width:100%;height:100%;}
+.csText{flex:1;min-width:0;}
+.csName{font:bold 13px "Noto Sans TC",sans-serif;color:#f0c040;margin-bottom:6px;text-shadow:1px 1px 0 #000;}
+.csContent{font:14px/1.7 "Noto Sans TC",sans-serif;color:#fff;white-space:pre-wrap;min-height:40px;}
+.csHint{font:10px "Press Start 2P",monospace;color:rgba(240,192,64,.65);text-align:right;margin-top:10px;}
 </style>
 </head>
 <body>
@@ -95,8 +129,8 @@ canvas#c{display:block;image-rendering:pixelated;image-rendering:crisp-edges;}
 <div id="tact">
   <b id="bHide" data-a="hide"><span class="ico">📦</span><span class="nm">紙箱</span></b>
   <b id="bClaw" data-a="claw"><span class="ico">🐾</span><span class="nm">貓爪</span></b>
-  <b id="bMeow" data-a="meow"><span class="ico">😻</span><span class="nm">喵！</span></b>
 </div>
+<div id="banner"><div class="bnFace" id="bnFace"></div><div class="bnText" id="bnText"></div></div>
 <div id="rpop"></div><div id="tpop"></div><div id="btFlash"></div>
 <div id="ov"><div class="bg"></div><div class="ct" id="ovc"></div></div>
 
@@ -115,12 +149,14 @@ setTimeout(resize,50);setTimeout(resize,300);setTimeout(resize,800);
 
 // Tiles
 const P=0,WL=1,CN=3,EX=4,SH=5,LF=6,PL=7,LT=8,CP=9,TR=10,SN=11,GM=12;
+// Tiered cans: 13=bronze, 14=silver, 15=gold; 16=key; 17=locked door
+const CN_B=13,CN_S=14,CN_G=15,KEY=16,DOOR=17;
 // Guard archetypes: 0=新人(易), 1=老陳(標準), 2=巡邏(專注), 3=隊長(範圍廣)
 const GUARD_TYPES=[
-  {name:'新人小林',hat:'#2a6a1a',accent:'#4a8a3a',bs:540,sightRange:5,susMul:0.65,broadcastRange:6,chaseSpeed:0.56},
-  {name:'老陳',    hat:'#1a1a3a',accent:'#3a3a6a',bs:440,sightRange:7,susMul:1.00,broadcastRange:8,chaseSpeed:0.52},
-  {name:'巡邏阿勇',hat:'#7a3a10',accent:'#aa5a20',bs:400,sightRange:6,susMul:1.25,broadcastRange:8,chaseSpeed:0.50},
-  {name:'夜班隊長',hat:'#5a1048',accent:'#8a2070',bs:380,sightRange:8,susMul:1.10,broadcastRange:999,chaseSpeed:0.50}
+  {name:'小林',hat:'#2a6a1a',accent:'#4a8a3a',bs:540,sightRange:5,susMul:0.5,broadcastRange:5,chaseSpeed:0.56},
+  {name:'陳師傅',hat:'#1a1a3a',accent:'#3a3a6a',bs:440,sightRange:6,susMul:1.00,broadcastRange:8,chaseSpeed:0.52},
+  {name:'阿勇',hat:'#7a3a10',accent:'#aa5a20',bs:400,sightRange:6,susMul:1.25,broadcastRange:8,chaseSpeed:0.46},
+  {name:'王隊長',hat:'#5a1048',accent:'#8a2070',bs:400,sightRange:6,susMul:1.10,broadcastRange:999,chaseSpeed:0.50}
 ];
 
 // ══════════════════════════════════
@@ -151,23 +187,33 @@ const BASE_MAP=[
  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],//20
 ];
 
-const CAN_SLOTS=[{x:2,y:2},{x:11,y:1},{x:24,y:2},{x:2,y:9},{x:14,y:9},{x:24,y:5},{x:2,y:17},{x:11,y:15},{x:22,y:18},{x:18,y:11}];
+// Can slots categorized by risk tier
+// Bronze (safe corners, easy start): top-left / bottom-left / top-right edges
+const BRONZE_SLOTS=[{x:2,y:2},{x:2,y:9},{x:2,y:17},{x:24,y:2}];
+// Silver (middle zones, moderate risk): require crossing patrol paths
+const SILVER_SLOTS=[{x:11,y:1},{x:14,y:9},{x:11,y:15},{x:22,y:18}];
+// Gold (dangerous — centerish, near captain patrol): requires real stealth
+const GOLD_SLOTS=[{x:18,y:11},{x:24,y:5},{x:14,y:5},{x:16,y:13}];
+// Store chosen positions so we can spawn them sequentially
+let chosenBronze=null,chosenSilver=null,chosenGold=null,chosenKey=null,chosenDoor=null;
 const PLANTER_SLOTS=[{x:6,y:1},{x:20,y:2},{x:8,y:5},{x:23,y:6},{x:6,y:9},{x:16,y:11},{x:3,y:15},{x:11,y:17},{x:22,y:16},{x:15,y:5},{x:20,y:19},{x:8,y:13},{x:25,y:15}];
 const TRASH_POS=[{x:12,y:5},{x:6,y:11},{x:18,y:15},{x:10,y:3}];
-// Golden mouse: only spawns in deep corners or near patrols (high-risk = high-reward)
-const GOLDEN_MOUSE_SLOTS=[{x:13,y:4},{x:25,y:11},{x:14,y:17},{x:1,y:19},{x:25,y:1},{x:9,y:13}];
 // Exit candidates — all in upper/mid map (y ≤ 12) to avoid being hidden by codec dialog at bottom
 const EXIT_SLOTS=[{x:25,y:1},{x:2,y:5},{x:17,y:4},{x:6,y:12},{x:25,y:11},{x:13,y:8},{x:5,y:7},{x:19,y:1}];
 let chosenExit=null; // set when all cans collected
 
 function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
 function buildMap(){const m=BASE_MAP.map(r=>[...r]);
-shuffle(CAN_SLOTS).slice(0,3).forEach(c=>{if(m[c.y][c.x]!==WL)m[c.y][c.x]=CN;});
+// Helper: is this position a walkable non-special tile we can safely place a can on?
+const ok=(s)=>{const t=m[s.y][s.x];return t===P||t===LF||t===CP||t===LT;};
+// Pre-pick all three can positions (shuffled per-game)
+chosenBronze=shuffle(BRONZE_SLOTS).find(ok)||BRONZE_SLOTS.find(ok)||BRONZE_SLOTS[0];
+chosenSilver=shuffle(SILVER_SLOTS).find(ok)||SILVER_SLOTS.find(ok)||SILVER_SLOTS[0];
+chosenGold=shuffle(GOLD_SLOTS).find(ok)||GOLD_SLOTS.find(ok)||GOLD_SLOTS[0];
+// Only place bronze on start — silver/gold spawn as player progresses
+m[chosenBronze.y][chosenBronze.x]=CN_B;
 shuffle(PLANTER_SLOTS).slice(0,6).forEach(p=>{if(m[p.y][p.x]===P||m[p.y][p.x]===LF)m[p.y][p.x]=PL;});
 TRASH_POS.forEach(t=>{if(m[t.y][t.x]===P)m[t.y][t.x]=TR;});
-// Place ONE golden mouse in a random valid floor slot
-const gm=shuffle(GOLDEN_MOUSE_SLOTS).find(g=>m[g.y][g.x]===P);
-if(gm)m[gm.y][gm.x]=GM;
 return m;}
 
 // Audio
@@ -191,7 +237,12 @@ function updateBGM(){const t=timer<=15?140:280;if(t!==bgmTgt){bgmTgt=t;bgmT=t;st
 let gs='title',map,pl,ens,pts,cans,timer,afxs,shake,codec,codect,disc,mvt,lt=0,meowCD=0,clawCD=0;
 let styleScore=0,rankTimer=0,closeTimer=0,tbTimer=0,meowDecoy=null,idleTimer=0;
 let prevHC=-1,prevHT=-1,prevHS=-1,prevHM=-1;
-let combo=0,comboTimer=0,wasDetected=false,bulletTime=0,knockCount=0,goldenMouseGot=false;
+let combo=0,comboTimer=0,wasDetected=false,bulletTime=0,knockCount=0;
+// Progression system
+let canPhase=0; // 0=need bronze, 1=need silver, 2=need gold, 3=gold got (1v1 with captain), 4=key got (all return)
+let hasKey=false;
+let withdrawT=0; // Duration since phase-3 transition started (for withdrawal animation)
+let returnT=0;  // Duration since phase-4 transition started (for return animation)
 let trashedTiles={},bananas=[],clawFX=[];
 const START_TIME=60,MAX_TIME=120,MEOW_CD=5000,CLAW_CD=2500,CAN_BONUS=30;
 const BACKSTAB_STUN=5000,FRUSTRATION_DUR=1000;
@@ -236,16 +287,27 @@ function syncKeys(){
   else if(!jA&&inp.dir>=0)inp.dir=-1;
   // Hide (紙箱): Shift — left pinky, natural hold
   if(kd.ShiftLeft||kd.ShiftRight)inp.hide=true;
-  // Claw (貓爪): Space (primary) + J/K (legacy)
-  if(kd.Space||kd.KeyJ||kd.KeyK)inp.claw=true;
-  // Meow (喵叫): E (primary, near WASD) + F/L (legacy)
-  if(kd.KeyE||kd.KeyF||kd.KeyL)inp.meow=true;
+  else if(!document.querySelector('#bHide.on'))inp.hide=false;
+  // Claw (貓爪): Space + J/K — short press = attack, long press = meow
+  // IMPORTANT: mirror keyboard state both directions (press AND release)
+  // But only overwrite if no touch/mouse button is currently pressed
+  const touchClaw=document.querySelector('#bClaw.on');
+  if(!touchClaw){
+    if(kd.Space||kd.KeyJ||kd.KeyK)inp.claw=true;
+    else inp.claw=false;
+  }
 }
 
 // Engine
 function astar(sx,sy,tx,ty){if(sx===tx&&sy===ty)return[];const open=[{x:sx,y:sy,g:0,h:Math.abs(tx-sx)+Math.abs(ty-sy),p:null}];const cl=new Set();const k=(x,y)=>y*CO+x;let it=0;while(open.length&&it++<800){open.sort((a,b)=>(a.g+a.h)-(b.g+b.h));const c=open.shift();if(c.x===tx&&c.y===ty){const p=[];let n=c;while(n.p){p.unshift({x:n.x,y:n.y});n=n.p;}return p;}cl.add(k(c.x,c.y));for(const[dx,dy]of[[0,-1],[0,1],[-1,0],[1,0]]){const nx=c.x+dx,ny=c.y+dy;if(nx<0||nx>=CO||ny<0||ny>=RO||cl.has(k(nx,ny)))continue;const t=map[ny][nx];if(t===WL||t===PL)continue;if(trashedTiles[nx+','+ny])continue;const g=c.g+1;const ex=open.find(n=>n.x===nx&&n.y===ny);if(!ex)open.push({x:nx,y:ny,g,h:Math.abs(tx-nx)+Math.abs(ty-ny),p:c});else if(g<ex.g){ex.g=g;ex.p=c;}}}return null;}
 function los(x1,y1,x2,y2){const dx=x2-x1,dy=y2-y1,st=Math.max(Math.abs(dx),Math.abs(dy));if(!st)return true;for(let i=1;i<=st;i++){const a=Math.round(x1+dx*i/st),b=Math.round(y1+dy*i/st);if(a<0||a>=CO||b<0||b>=RO)return false;const t=map[b][a];if(t===WL||t===PL)return false;}return true;}
-function getFlash(e){const tiles=[],dirs=[[0,-1],[0,1],[-1,0],[1,0]],d=dirs[e.vd],perps=d[0]===0?[[1,0],[-1,0]]:[[0,1],[0,-1]];const maxD=e.sightRange||7;for(let dist=1;dist<=maxD;dist++){const fx=e.x+d[0]*dist,fy=e.y+d[1]*dist;if(fx<0||fx>=CO||fy<0||fy>=RO||map[fy][fx]===WL||map[fy][fx]===PL||!los(e.x,e.y,fx,fy))break;tiles.push({x:fx,y:fy,dist});const sp=Math.floor(dist*.6);for(const pd of perps)for(let s=1;s<=sp;s++){const sx=fx+pd[0]*s,sy=fy+pd[1]*s;if(sx<0||sx>=CO||sy<0||sy>=RO||map[sy][sx]===WL||map[sy][sx]===PL)break;if(los(e.x,e.y,sx,sy))tiles.push({x:sx,y:sy,dist});else break;}}return tiles;}
+function getFlash(e){const tiles=[],dirs=[[0,-1],[0,1],[-1,0],[1,0]],d=dirs[e.vd],perps=d[0]===0?[[1,0],[-1,0]]:[[0,1],[0,-1]];
+  // Phase bonuses: 陳師傅 (type 1) gets +1 sight after silver taken
+  let maxD=e.sightRange||7;
+  if(e.type===1&&canPhase>=2)maxD+=1;
+  if(e.type===3&&canPhase===3&&!hasKey)maxD+=1; // Hunter mode
+  if(canPhase===4&&e.withdrawState==='frenzy')maxD+=1; // Frenzy all
+  for(let dist=1;dist<=maxD;dist++){const fx=e.x+d[0]*dist,fy=e.y+d[1]*dist;if(fx<0||fx>=CO||fy<0||fy>=RO||map[fy][fx]===WL||map[fy][fx]===PL||!los(e.x,e.y,fx,fy))break;tiles.push({x:fx,y:fy,dist});const sp=Math.floor(dist*.6);for(const pd of perps)for(let s=1;s<=sp;s++){const sx=fx+pd[0]*s,sy=fy+pd[1]*s;if(sx<0||sx>=CO||sy<0||sy>=RO||map[sy][sx]===WL||map[sy][sx]===PL)break;if(los(e.x,e.y,sx,sy))tiles.push({x:sx,y:sy,dist});else break;}}return tiles;}
 function isInSafe(px,py){for(const[dx,dy]of[[0,-1],[0,1],[-1,0],[1,0]]){const nx=px+dx,ny=py+dy;if(nx>=0&&nx<CO&&ny>=0&&ny<RO&&map[ny][nx]===PL)return true;}return false;}
 function emit(x,y,c,l,vx=0,vy=0,sz=3){pts.push({x:x*T+T/2,y:y*T+T/2,c,l,ml:l,vx,vy,s:sz+Math.random()*2});}
 function leafB(x,y){for(let i=0;i<6;i++)emit(x,y,Math.random()>.5?'#7a9a4a':'#5a7a2a',500,(Math.random()-.5)*2,(Math.random()-.5)*2-1);}
@@ -267,14 +329,65 @@ function showCodec(t,d){
   }
   codec=t;codect=newDur;
 }
+
+// ═══════════════════════════════════════════════
+//  STORY BANNER (non-blocking, top of canvas)
+// ═══════════════════════════════════════════════
+const BANNER_FACES={
+  kurokichi:'🐈', kobayashi:'🟢', chen:'🔵', ahyong:'🟠', captain:'🟣'
+};
+let bannerQueue=[],bannerT=0,bannerActive=null;
+function queueDialog(face,name,text){
+  // Compact format for banner: <b>name:</b> text
+  bannerQueue.push({face,name,text,dur:text.length>12?5000:4000});
+}
+function showNextBanner(){
+  if(bannerQueue.length===0){bannerActive=null;return;}
+  bannerActive=bannerQueue.shift();
+  bannerT=bannerActive.dur;
+  const el=$('banner');
+  $('bnFace').textContent=BANNER_FACES[bannerActive.face]||'🐈';
+  $('bnText').innerHTML=`<b>${bannerActive.name}：</b>${bannerActive.text.replace(/\n/g,' ')}`;
+  el.classList.remove('out');el.classList.add('show');
+}
+function updateBanner(dt){
+  if(bannerT>0){
+    bannerT-=dt;
+    if(bannerT<=300&&!$('banner').classList.contains('out')){
+      $('banner').classList.add('out');
+    }
+    if(bannerT<=0){
+      $('banner').classList.remove('show','out');
+      bannerActive=null;
+      // Advance to next after a small gap
+      if(bannerQueue.length>0)setTimeout(showNextBanner,150);
+    }
+  }else if(!bannerActive&&bannerQueue.length>0){
+    showNextBanner();
+  }
+}
+function pickDoorSlot(){
+  // Doors spawn in the upper map area to avoid codec overlap, same logic as old exit
+  const DOOR_SLOTS=[{x:25,y:1},{x:2,y:5},{x:17,y:4},{x:6,y:12},{x:25,y:11},{x:13,y:8},{x:5,y:7},{x:19,y:1}];
+  const valid=shuffle(DOOR_SLOTS).filter(s=>{
+    const tt=map[s.y][s.x];
+    if(tt!==P&&tt!==LF&&tt!==CP&&tt!==LT)return false;
+    if(s.x===pl.x&&s.y===pl.y)return false;
+    if(ens.some(e=>e.x===s.x&&e.y===s.y))return false;
+    return true;
+  });
+  return valid[0]||{x:25,y:1};
+}
 function showTB(s){const tp=$('tpop');tp.textContent=`+${s}s`;tp.classList.remove('show');void tp.offsetWidth;tp.classList.add('show');tbTimer=1300;sfx.timeUp();}
 function addStyle(p,r){styleScore+=p;const rp=$('rpop');rp.style.color=p>=25?'#ff2222':p>=15?'#ff8800':'#88ff88';rp.textContent=`+${p} ${r}`;rp.classList.add('show');rankTimer=1200;sfx.rank();}
 function speedMul(){return 1-cans.filter(c=>c.got).length*0.08;}
 
-function initGame(){map=buildMap();cans=[];for(let r=0;r<RO;r++)for(let c=0;c<CO;c++)if(map[r][c]===CN)cans.push({x:c,y:r,got:false});
-disc=Array.from({length:RO},()=>Array(CO).fill(false));pl={x:1,y:1,dir:1,hidden:false,fr:0,frustrationT:0,clawHeld:false};
-// Shuffle guard types so positions ≠ archetype each game
-const typeAssign=shuffle([0,1,2,3]);
+function initGame(){map=buildMap();cans=[{x:chosenBronze.x,y:chosenBronze.y,tier:'bronze',got:false}];
+disc=Array.from({length:RO},()=>Array(CO).fill(false));pl={x:1,y:1,dir:1,hidden:false,fr:0,frustrationT:0,clawHeld:false,clawHoldT:0,meowFired:false};
+// Captain (type 3) always patrols the central area near gold cans (slot index 1)
+// Other types shuffled among remaining slots
+const otherTypes=shuffle([0,1,2]);
+const typeAssign=[otherTypes[0],3,otherTypes[1],otherTypes[2]];
 const spawns=[
   {x:10,y:3,vd:1,pat:[[10,3],[10,6],[6,6],[6,3]]},
   {x:22,y:4,vd:2,pat:[[22,4],[18,4],[18,8],[22,8]]},
@@ -284,16 +397,61 @@ const spawns=[
 ens=spawns.map((s,i)=>{
   const t=typeAssign[i],g=GUARD_TYPES[t];
   return {x:s.x,y:s.y,vd:s.vd,pat:s.pat,pi:0,type:t,name:g.name,hat:g.hat,accent:g.accent,bs:g.bs,sightRange:g.sightRange,susMul:g.susMul,broadcastRange:g.broadcastRange,chaseSpeed:g.chaseSpeed,
-  mode:'patrol',ls:null,inv:0,mt:0,at:0,st:0,sus:0,turnT:0,slideVx:0,slideVy:0,slideT:0,petT:0,boxPause:0,stunType:0,scanT:0,scanDir:0,searchSteps:0,lastSpotted:null,lastSpottedAge:0,detourCD:0};
+  mode:'patrol',ls:null,inv:0,mt:0,at:0,st:0,sus:0,turnT:0,slideVx:0,slideVy:0,slideT:0,petT:0,boxPause:0,stunType:0,scanT:0,scanDir:0,searchSteps:0,lastSpotted:null,lastSpottedAge:0,detourCD:0,withdrawState:'active',withdrawTarget:null,withdrawFade:1,whipState:'idle',whipT:0,whipDir:0,whipCD:0};
 });
 pts=[];afxs=[];meowDecoy=null;trashedTiles={};bananas=[];clawFX=[];
-timer=START_TIME;mvt=0;meowCD=0;clawCD=0;codect=0;codec='';shake=0;styleScore=0;rankTimer=0;closeTimer=0;tbTimer=0;idleTimer=0;combo=0;comboTimer=0;wasDetected=false;bulletTime=0;knockCount=0;goldenMouseGot=false;chosenExit=null;bgmTgt=280;bgmT=280;prevHC=-1;prevHT=-1;prevHS=-1;prevHM=-1;
-showCodec('黑吉！背刺偷襲+金鼠加分！',3500);}
+timer=START_TIME;mvt=0;meowCD=0;clawCD=0;codect=0;codec='';shake=0;styleScore=0;rankTimer=0;closeTimer=0;tbTimer=0;idleTimer=0;combo=0;comboTimer=0;wasDetected=false;bulletTime=0;knockCount=0;chosenExit=null;canPhase=0;hasKey=false;withdrawT=0;returnT=0;bannerQueue=[];bannerActive=null;bannerT=0;$('banner').classList.remove('show','out');bgmTgt=280;bgmT=280;prevHC=-1;prevHT=-1;prevHS=-1;prevHM=-1;
+queueDialog('kurokichi','黑磯','深夜 12 點。紅磚深巷。');
+queueDialog('kurokichi','黑磯','目標：銅、銀、金三罐。');}
 
 // ══════════════════
 //  AI with comedy
 // ══════════════════
 function updateAI(e,dt){
+  // ── WITHDRAWAL / RETURN STATES (phase 3+4) ──
+  if(e.withdrawState==='withdrawing'){
+    // Walk toward corner, fade out
+    e.withdrawFade-=dt/1500; // 1.5s fade
+    if(e.withdrawFade<=0){e.withdrawFade=0;e.withdrawState='withdrawn';e.x=e.withdrawTarget.x;e.y=e.withdrawTarget.y;return;}
+    // Move toward corner every 300ms
+    e.mt=(e.mt||0)-dt;
+    if(e.mt<=0){e.mt=300;
+      const dx=Math.sign(e.withdrawTarget.x-e.x),dy=Math.sign(e.withdrawTarget.y-e.y);
+      if(dx!==0||dy!==0){
+        // Try moving horizontally first, then vertically
+        const t1x=e.x+dx,t1y=e.y;
+        if(dx!==0&&map[t1y]&&map[t1y][t1x]!==WL&&map[t1y][t1x]!==PL){e.x=t1x;e.vd=dx>0?3:2;}
+        else if(dy!==0){
+          const t2x=e.x,t2y=e.y+dy;
+          if(map[t2y]&&map[t2y][t2x]!==WL&&map[t2y][t2x]!==PL){e.y=t2y;e.vd=dy>0?1:0;}
+        }
+      }
+    }
+    return;
+  }
+  if(e.withdrawState==='withdrawn'){
+    // Frozen at corner, no rendering needed (drawGuard skips when fade=0)
+    return;
+  }
+  if(e.withdrawState==='returning'){
+    // Fade back in
+    e.withdrawFade=Math.min(1,e.withdrawFade+dt/1200);
+    // Move toward player aggressively
+    e.mt=(e.mt||0)-dt;
+    const moveSpeed=240; // fast — phase 4 frenzy
+    if(e.mt<=0){e.mt=moveSpeed;
+      const p=astar(e.x,e.y,pl.x,pl.y);
+      if(p&&p.length){uDir(e,p[0]);e.x=p[0].x;e.y=p[0].y;}
+    }
+    // Once fully faded in and near center, switch to frenzy (regular chase)
+    if(e.withdrawFade>=1&&Math.abs(e.x-pl.x)+Math.abs(e.y-pl.y)<=12){
+      e.withdrawState='frenzy';e.mode='chase';e.ls={x:pl.x,y:pl.y};e.sus=100;e.inv=6000;
+      e.lastSpotted={x:pl.x,y:pl.y};e.lastSpottedAge=0;
+    }
+    return;
+  }
+  // frenzy guards act like normal chasers (no special handling, fall through)
+
   // Sliding on banana peel!
   if(e.slideT>0){
     e.slideT-=dt;
@@ -310,6 +468,87 @@ function updateAI(e,dt){
   if(e.boxPause>0){e.boxPause-=dt;return;}
   if(e.st>0){e.st-=dt;return;}
   if(e.at>0)e.at-=dt;
+
+  // ══════════════════════════════════════════════════════
+  //  🟣 CAPTAIN BOSS AI — Phase 3: whip combat instead of patrol
+  // ══════════════════════════════════════════════════════
+  if(e.type===3&&canPhase===3&&!hasKey){
+    // Always face player
+    e.vd=dirTo(e,pl.x,pl.y);
+    if(e.whipCD>0)e.whipCD-=dt;
+    const dist=Math.abs(e.x-pl.x)+Math.abs(e.y-pl.y);
+
+    if(e.whipState==='idle'){
+      // Movement: slowly approach player (half speed)
+      e.mt-=dt;
+      if(e.mt<=0){e.mt=360; // slow movement
+        if(dist>2){
+          // Approach
+          const p=astar(e.x,e.y,pl.x,pl.y);
+          if(p&&p.length){e.x=p[0].x;e.y=p[0].y;}
+        }
+      }
+      // Trigger whip attack every 2.5s when player within 4 tiles straight
+      if(e.whipCD<=0){
+        // Check if player is in a cardinal direction (not diagonal) within 4 tiles
+        const dx=pl.x-e.x,dy=pl.y-e.y;
+        const inLine=(dx===0&&Math.abs(dy)<=4)||(dy===0&&Math.abs(dx)<=4);
+        if(inLine||dist<=3){
+          // Aim toward player's current tile
+          e.whipDir=Math.abs(dx)>Math.abs(dy)?(dx>0?3:2):(dy>0?1:0);
+          e.whipState='aiming';e.whipT=800; // 0.8s telegraph
+        }
+      }
+      return;
+    }
+    if(e.whipState==='aiming'){
+      e.whipT-=dt;
+      e.vd=e.whipDir; // lock facing during aim
+      if(e.whipT<=0){
+        // Strike! Check if player is on the whip line
+        e.whipState='striking';e.whipT=200; // 200ms strike flash
+        const dd=[[0,-1],[0,1],[-1,0],[1,0]][e.whipDir];
+        let hitPlayer=false;
+        for(let d=1;d<=4;d++){
+          const tx=e.x+dd[0]*d,ty=e.y+dd[1]*d;
+          if(tx<0||tx>=CO||ty<0||ty>=RO)break;
+          if(map[ty][tx]===WL||map[ty][tx]===PL)break;
+          if(pl.x===tx&&pl.y===ty&&!pl.hidden){hitPlayer=true;break;}
+        }
+        if(hitPlayer){
+          // Whip hit — game over
+          gs='gameover';sfx.over();stopBGM();shake=500;haptic(220);
+        }
+      }
+      return;
+    }
+    if(e.whipState==='striking'){
+      e.whipT-=dt;
+      if(e.whipT<=0){e.whipState='recovery';e.whipT=1000;} // 1s vulnerability window
+      return;
+    }
+    if(e.whipState==='recovery'){
+      e.whipT-=dt;
+      if(e.whipT<=0){e.whipState='idle';e.whipCD=2500;}
+      return;
+    }
+  }
+  // ══════════════════════════════════════════════════════
+  //  💨 PHASE 4: All guards are pure chasers (collision = death)
+  // ══════════════════════════════════════════════════════
+  if(canPhase===4&&e.withdrawState!=='withdrawing'&&e.withdrawState!=='withdrawn'){
+    // Fast pursuit
+    e.mt-=dt;
+    if(e.mt<=0){e.mt=200;
+      const p=astar(e.x,e.y,pl.x,pl.y);
+      if(p&&p.length){uDir(e,p[0]);e.x=p[0].x;e.y=p[0].y;}
+    }
+    // Collision = game over
+    if(e.x===pl.x&&e.y===pl.y&&!pl.hidden){
+      gs='gameover';sfx.over();stopBGM();shake=400;haptic(200);
+    }
+    return;
+  }
 
   // ── GLANCE: during patrol, briefly look 180° backward (punishes tailing) ──
   if(e.glanceT>0){e.glanceT-=dt;if(e.glanceT<=0&&e.glanceVd!==undefined){e.vd=e.glanceVd;e.glanceVd=undefined;}
@@ -380,7 +619,16 @@ function updateAI(e,dt){
   if(dl&&e.mode!=='chase'){e.mode='investigate';e.ls={x:meowDecoy.x,y:meowDecoy.y};e.inv=6000;}
 
   if(tLure&&e.mode!=='chase'){e.mode='investigate';e.ls=tLure;e.inv=6000;}
-  if(!inC&&hear&&e.mode==='patrol'&&!dl){e.mode='investigate';e.ls={x:pl.x,y:pl.y};e.inv=4000;sfx.suspect();}
+  if(!inC&&hear&&e.mode==='patrol'&&!dl){
+    // 阿勇 (type 2) after silver → chases immediately instead of investigating
+    if(e.type===2&&canPhase>=2){
+      e.mode='chase';e.ls={x:pl.x,y:pl.y};e.sus=100;e.at=700;
+      e.lastSpotted={x:pl.x,y:pl.y};e.lastSpottedAge=0;
+      sfx.alert();afxs.push({x:e.x,y:e.y,t:700});shake=200;haptic(100);wasDetected=true;combo=0;
+    }else{
+      e.mode='investigate';e.ls={x:pl.x,y:pl.y};e.inv=4000;sfx.suspect();
+    }
+  }
   const claw=pts.filter(p=>{const px=Math.floor(p.x/T),py=Math.floor(p.y/T);return flash.some(t=>t.x===px&&t.y===py)&&typeof p.c==='string'&&p.c.includes('200,180,140');});
   if(claw.length>0&&e.mode==='patrol'){e.mode='investigate';e.ls={x:Math.floor(claw[0].x/T),y:Math.floor(claw[0].y/T)};e.inv=3500;}
   if(e.mode==='investigate'){e.inv-=dt;if(e.inv<=0){e.mode='patrol';e.ls=null;e.sus=Math.max(e.sus-20,0);e.scanT=0;e.searchSteps=0;}}
@@ -399,7 +647,11 @@ function updateAI(e,dt){
   }
 
   const sm=speedMul(),cs=e.bs*sm;
-  const spd=e.mode==='chase'?cs*(e.chaseSpeed||0.48):e.mode==='investigate'?cs*.68:cs;
+  let spd=e.mode==='chase'?cs*(e.chaseSpeed||0.48):e.mode==='investigate'?cs*.68:cs;
+  // Phase 3: Captain hunter mode (+15% speed)
+  if(e.type===3&&canPhase===3&&!hasKey)spd*=0.87;
+  // Phase 4: Frenzy (+20% speed for all returning guards)
+  if(canPhase===4&&e.withdrawState==='frenzy')spd*=0.83;
 
   // ── Scan-in-place: head rotates 4 directions at investigate point ──
   if(e.scanT>0){e.scanT-=dt;
@@ -471,7 +723,11 @@ function uDir(e,n){if(n.x>e.x)e.vd=3;else if(n.x<e.x)e.vd=2;else if(n.y>e.y)e.vd
 function dirTo(e,tx,ty){const dx=tx-e.x,dy=ty-e.y;return Math.abs(dx)>Math.abs(dy)?(dx>0?3:2):(dy>0?1:0);}
 function pVis(){const ts=[],R=6;for(let dy=-R;dy<=R;dy++)for(let dx=-R;dx<=R;dx++){const tx=pl.x+dx,ty=pl.y+dy;if(tx<0||tx>=CO||ty<0||ty>=RO||Math.sqrt(dx*dx+dy*dy)>R)continue;if(los(pl.x,pl.y,tx,ty))ts.push({x:tx,y:ty});}return ts;}
 
-function update(dt0){if(gs!=='playing')return;syncKeys();const btA=bulletTime>0;const dt=btA?dt0*0.5:dt0;
+function update(dt0){
+  // Banner ticks every frame regardless of state
+  updateBanner(dt0);
+  if(gs!=='playing')return;
+  syncKeys();const btA=bulletTime>0;const dt=btA?dt0*0.5:dt0;
 // Cooldowns in REAL time (not bullet time)
 if(meowCD>0)meowCD-=dt0;if(clawCD>0)clawCD-=dt0;
 if(bulletTime>0){bulletTime-=dt0;if(bulletTime<=0)$('btFlash').classList.remove('show');}
@@ -489,114 +745,203 @@ if(inp.dir>=0)idleTimer=0;else idleTimer+=dt;
 const onCp=map[pl.y]&&map[pl.y][pl.x]===CP;
 const delay=onCp?105:115;
 // Movement blocked during frustration stun
-mvt-=dt;if(mvt<=0&&inp.dir>=0&&!pl.hidden&&pl.frustrationT<=0){
+mvt-=dt;if(mvt<=0&&inp.dir>=0&&!pl.hidden){
   const dd=[[0,-1],[0,1],[-1,0],[1,0]][inp.dir],nx=pl.x+dd[0],ny=pl.y+dd[1];pl.dir=inp.dir;
   if(nx>=0&&nx<CO&&ny>=0&&ny<RO){const t=map[ny][nx];const trashed=trashedTiles[nx+','+ny];
   if(t!==WL&&t!==PL&&!trashed){pl.x=nx;pl.y=ny;onCp?sfx.carpet():sfx.step();if(t===LF)leafB(nx,ny);
-  // Can
-  const ch=cans.find(c=>c.x===nx&&c.y===ny&&!c.got);if(ch){ch.got=true;map[ny][nx]=P;sfx.can();sparkle(nx,ny);tSpark(nx,ny);timer=Math.min(timer+CAN_BONUS,MAX_TIME);showTB(CAN_BONUS);combo++;comboTimer=8000;const cb=combo>1?combo*5:0;addStyle(20+cb,combo>1?`x${combo} COMBO！`:'罐頭 GET！');if(combo>1){$('comboBox').textContent=`COMBO x${combo}`;$('comboBox').classList.add('show');}
-    const left=cans.filter(c=>!c.got).length;
-    if(left){showCodec(`續命！剩 ${left} 個`,2200);}
-    else{
-      // ── ALL CANS COLLECTED → spawn exit at a random valid upper-map slot ──
-      const valid=shuffle(EXIT_SLOTS).filter(s=>{
-        // Must be floor/leaf/carpet (not wall, not planter, not another entity tile)
-        const tt=map[s.y][s.x];
-        if(tt!==P&&tt!==LF&&tt!==CP&&tt!==LT)return false;
-        // Must not be the cat's current location
-        if(s.x===pl.x&&s.y===pl.y)return false;
-        // Must not be a guard's current location
-        if(ens.some(e=>e.x===s.x&&e.y===s.y))return false;
-        return true;
-      });
-      if(valid.length){
-        chosenExit=valid[0];
-        map[chosenExit.y][chosenExit.x]=EX;
-        // Burst of light particles at the spawn point
-        for(let i=0;i<30;i++){const a=Math.PI*2*i/30;emit(chosenExit.x,chosenExit.y,'#44ffaa',1600,Math.cos(a)*2.5,Math.sin(a)*2.5,5);}
-        // Also burst at player to show the connection
-        for(let i=0;i<10;i++)emit(pl.x,pl.y,'#44ffaa',1000,(Math.random()-.5)*2,(Math.random()-.5)*2,3);
-        shake=200;haptic(120);sfx.win();
-        showCodec('全部收齊！出口出現了！快逃！',3500);
-      }else{
-        // Extreme edge case — fall back to a known-clear tile
-        chosenExit={x:25,y:1};
-        map[1][25]=EX;
-        showCodec('全部收齊！出口出現了！',3500);
+  // ─── TIERED CAN PICKUP ───
+  if(t===CN_B||t===CN_S||t===CN_G){
+    const ch=cans.find(c=>c.x===nx&&c.y===ny&&!c.got);
+    if(ch){
+      ch.got=true;map[ny][nx]=P;sfx.can();sparkle(nx,ny);tSpark(nx,ny);
+      timer=Math.min(timer+CAN_BONUS,MAX_TIME);showTB(CAN_BONUS);
+      combo++;comboTimer=8000;const cb=combo>1?combo*5:0;
+      if(t===CN_B){
+        addStyle(20+cb,'🟫 銅罐頭！');canPhase=1;
+        // Spawn silver can
+        if(chosenSilver){
+          const ss=map[chosenSilver.y][chosenSilver.x];
+          if(ss===P||ss===LF||ss===CP||ss===LT){
+            map[chosenSilver.y][chosenSilver.x]=CN_S;
+            cans.push({x:chosenSilver.x,y:chosenSilver.y,tier:'silver',got:false});
+            for(let i=0;i<25;i++){const a=Math.PI*2*i/25;emit(chosenSilver.x,chosenSilver.y,'#CCCCCC',1600,Math.cos(a)*2.5,Math.sin(a)*2.5,4);}
+            shake=150;haptic(80);
+          }
+        }
+        // Queue cutscene: Kobayashi
+        queueDialog('kobayashi','小林','欸？剛才是不是有聲音？\n...算了，大概是風吧。');
+      }else if(t===CN_S){
+        addStyle(35+cb,'🥈 銀罐頭！');canPhase=2;
+        // Spawn gold can
+        if(chosenGold){
+          const gg=map[chosenGold.y][chosenGold.x];
+          if(gg===P||gg===LF||gg===CP||gg===LT){
+            map[chosenGold.y][chosenGold.x]=CN_G;
+            cans.push({x:chosenGold.x,y:chosenGold.y,tier:'gold',got:false});
+            for(let i=0;i<30;i++){const a=Math.PI*2*i/30;emit(chosenGold.x,chosenGold.y,'#FFD700',2000,Math.cos(a)*3,Math.sin(a)*3,5);}
+            shake=200;haptic(120);
+          }
+        }
+        // Queue cutscene: Chen + cat notices the glow
+        queueDialog('chen','陳師傅','不對勁！⸺ 進入警戒！');
+        queueDialog('kurokichi','黑磯','銀罐頭⸺ 在那道閃光！');
+      }else if(t===CN_G){
+        addStyle(60+cb,'🥇 金罐頭！');canPhase=3;withdrawT=0;
+        // ⚡ PHASE 3 TRANSITION: Captain orders other guards to withdraw
+        queueDialog('captain','王隊長','各位退下！這隻貓我親自處理！');
+        queueDialog('captain','王隊長','一對一⸺ 才是我的尊嚴。');
+        queueDialog('kurokichi','黑磯','金罐頭⸺ 隊長守著的那個！');
+        ens.forEach(g=>{
+          if(g.type!==3){
+            g.withdrawState='withdrawing';
+            const corners=[{x:1,y:1},{x:CO-2,y:1},{x:1,y:RO-2},{x:CO-2,y:RO-2}];
+            let best=corners[0],bd=999;
+            for(const c of corners){const d=Math.abs(c.x-g.x)+Math.abs(c.y-g.y);if(d<bd){bd=d;best=c;}}
+            g.withdrawTarget=best;g.mode='patrol';g.sus=0;g.ls=null;g.inv=0;
+          }
+        });
+        // Reset captain to clean patrol so his dialog plays
+        const cap=ens.find(g=>g.type===3);
+        if(cap){cap.mode='patrol';cap.sus=0;cap.ls=null;}
       }
+      if(combo>1){$('comboBox').textContent=`COMBO x${combo}`;$('comboBox').classList.add('show');}
     }
   }
-  // 🐁 GOLDEN MOUSE — big style bonus + small timer bonus, risky location
-  if(t===GM&&!goldenMouseGot){goldenMouseGot=true;map[ny][nx]=P;sfx.can();sfx.meow();sparkle(nx,ny);sparkle(nx,ny);tSpark(nx,ny);for(let i=0;i<20;i++)emit(nx,ny,'#FFD700',900,(Math.random()-.5)*3,(Math.random()-1.2)*2.2,4);timer=Math.min(timer+10,MAX_TIME);showTB(10);addStyle(50,'🐁 黃金老鼠！');shake=150;haptic(80);showCodec('老鼠玩具！傳說中的神器！',2200);}
-  if(t===EX&&cans.every(c=>c.got)){gs='win';sfx.win();stopBGM();const b=getBest();if(styleScore>b)setBest(styleScore);}
+  // ─── KEY PICKUP (dropped from captain when stunned) ───
+  if(t===KEY){
+    map[ny][nx]=P;sfx.can();sfx.alert();
+    for(let i=0;i<24;i++){const a=Math.PI*2*i/24;emit(nx,ny,'#FFD700',1400,Math.cos(a)*2,Math.sin(a)*2,4);}
+    hasKey=true;canPhase=4;shake=180;haptic(100);returnT=0;
+    addStyle(50,'🔑 鑰匙！');
+    // +15s bonus for final escape sequence
+    timer=Math.min(timer+15,MAX_TIME);showTB(15);
+    if(!chosenDoor){chosenDoor=pickDoorSlot();if(chosenDoor)map[chosenDoor.y][chosenDoor.x]=DOOR;}
+    // ⚡ PHASE 4 TRANSITION: Captain orders all guards to return
+    queueDialog('captain','王隊長','可惡！我輸了！');
+    queueDialog('captain','王隊長','大家快追！別讓他跑了！');
+    queueDialog('kurokichi','黑磯','鑰匙到手。門⸺ 在那邊！');
+    // Wake all withdrawn guards, set them returning
+    ens.forEach(g=>{
+      if(g.type!==3&&(g.withdrawState==='withdrawn'||g.withdrawState==='withdrawing')){
+        g.withdrawState='returning';
+        g.withdrawFade=0.1;
+      }
+      // Captain stops whipping — he's defeated for narrative purposes, but still chases in phase 4
+      if(g.type===3){g.whipState='idle';g.whipT=0;g.whipCD=0;}
+    });
+  }
+  // ─── DOOR: open if you have key ───
+  if(t===DOOR&&hasKey){
+    gs='win';sfx.win();stopBGM();const b=getBest();if(styleScore>b)setBest(styleScore);
+  }
   if(closeTimer<=0&&ens.some(e=>Math.abs(e.x-pl.x)+Math.abs(e.y-pl.y)<=2&&e.st<=0&&e.mode!=='patrol')){addStyle(25,'死裡逃生！');closeTimer=3000;sfx.close();haptic(40);}
   }}mvt=delay;pl.fr=1-pl.fr;}
 
 // ══════════════════════════════════
-//  🐾 CAT CLAW — context-sensitive action
+//  🐾 CAT CLAW — press to attack (no long-press anymore)
 // ══════════════════════════════════
-if(inp.claw&&!pl.clawHeld&&clawCD<=0&&pl.frustrationT<=0&&!pl.hidden){
+if(inp.claw&&!pl.clawHeld&&clawCD<=0&&!pl.hidden){
   pl.clawHeld=true;
   clawCD=CLAW_CD;
-  // Find adjacent guards (Manhattan distance 1), prefer backstabbable
-  const adj=ens.filter(e=>e.st<=0&&e.slideT<=0&&e.petT<=0&&Math.abs(e.x-pl.x)+Math.abs(e.y-pl.y)===1);
-  let target=null,frontal=false;
-  for(const g of adj){
-    const fl=getFlash(g);
-    const seen=fl.some(t=>t.x===pl.x&&t.y===pl.y);
-    if(!seen){target=g;frontal=false;break;}
-    else if(!target){target=g;frontal=true;}
+  // ── LINE CAST: scan 3 tiles in facing direction, pick first guard ──
+  const dd=[[0,-1],[0,1],[-1,0],[1,0]][pl.dir];
+  let target=null,frontal=false,targetDist=0,hitWall=false;
+  for(let d=1;d<=3&&!target&&!hitWall;d++){
+    const cx0=pl.x+dd[0]*d,cy0=pl.y+dd[1]*d;
+    if(cx0<0||cx0>=CO||cy0<0||cy0>=RO){hitWall=true;break;}
+    const tt=map[cy0][cx0];
+    if(tt===WL||tt===PL){hitWall=true;break;}
+    const g=ens.find(e=>e.st<=0&&e.slideT<=0&&e.petT<=0&&e.x===cx0&&e.y===cy0);
+    if(g){
+      target=g;targetDist=d;
+      if(g.type===3&&canPhase===3){
+        frontal=(g.whipState!=='recovery');
+      }else{
+        const fl=getFlash(g);
+        const seen=fl.some(t=>t.x===pl.x&&t.y===pl.y);
+        frontal=seen;
+      }
+      break;
+    }
+  }
+  // Spawn claw trail FX along the cast line
+  {
+    const trailEnd=target?targetDist:(hitWall?Math.max(1,targetDist):3);
+    for(let d=1;d<=trailEnd;d++){
+      const tx0=pl.x+dd[0]*d,ty0=pl.y+dd[1]*d;
+      if(tx0<0||tx0>=CO||ty0<0||ty0>=RO)break;
+      clawFX.push({x:tx0,y:ty0,t:300-d*40,maxT:300-d*40,dir:pl.dir});
+    }
   }
   if(target&&!frontal){
-    // 🥷 BACKSTAB SUCCESS — 5s big stun
+    // 🥷 BACKSTAB SUCCESS
     sfx.crash();crashFX(target.x,target.y);
-    target.st=BACKSTAB_STUN;target.stunType=1; // 1 = claw stun (curled + slashed)
+    const isCaptain=target.type===3;
+    target.st=isCaptain?BACKSTAB_STUN+3000:BACKSTAB_STUN;target.stunType=1;
     target.mode='patrol';target.sus=0;target.ls=null;target.inv=0;
-    // Face player away from guard so claw direction makes sense
     const slashDir=(target.x>pl.x)?3:(target.x<pl.x)?2:(target.y>pl.y)?1:0;
-    clawFX.push({x:target.x,y:target.y,t:400,dir:slashDir});
-    shake=300;haptic(120);knockCount++;
+    clawFX.push({x:target.x,y:target.y,t:500,maxT:500,dir:slashDir});
+    shake=isCaptain?400:300;haptic(isCaptain?160:120);knockCount++;
     combo++;comboTimer=8000;const cb=combo>1?combo*10:0;
-    addStyle(40+cb,combo>1?`x${combo} 連續伏擊！`:'🥷 貓爪伏擊！');
+    addStyle((isCaptain?80:40)+cb,combo>1?`x${combo} 連續伏擊！`:(isCaptain?'🥷 隊長背刺！':'🥷 貓爪伏擊！'));
     if(combo>1){$('comboBox').textContent=`COMBO x${combo}`;$('comboBox').classList.add('show');}
-    showCodec(`「${CLAW_HITS[Math.random()*CLAW_HITS.length|0]}」`,2500);
-    // Brief bullet time on successful backstab for cinematic feel
+    if(isCaptain&&canPhase>=3&&!hasKey){
+      let kx=target.x,ky=target.y;
+      if(map[ky][kx]!==P&&map[ky][kx]!==LF&&map[ky][kx]!==CP&&map[ky][kx]!==LT){
+        for(const[dx,dy]of[[0,1],[0,-1],[1,0],[-1,0]]){
+          const cx0=target.x+dx,cy0=target.y+dy;
+          if(cy0>=0&&cy0<RO&&cx0>=0&&cx0<CO&&(map[cy0][cx0]===P||map[cy0][cx0]===LF||map[cy0][cx0]===CP||map[cy0][cx0]===LT)){kx=cx0;ky=cy0;break;}
+        }
+      }
+      map[ky][kx]=KEY;
+      for(let i=0;i<25;i++){const a=Math.PI*2*i/25;emit(kx,ky,'#FFD700',1500,Math.cos(a)*2.5,Math.sin(a)*2.5,4);}
+      queueDialog('captain','王隊長','...鑰匙...被搶走了！');
+    }else{
+      showCodec(`「${CLAW_HITS[Math.random()*CLAW_HITS.length|0]}」`,2500);
+    }
     if(bulletTime<=0){bulletTime=250;$('btFlash').classList.add('show');}
   }else if(target&&frontal){
-    // 😾 FRONTAL FAIL — player stiffens, guard goes straight to chase
+    // 😾 FRONTAL FAIL — knockback + extended claw cooldown (but player can move)
     sfx.suspect();
-    pl.frustrationT=FRUSTRATION_DUR;
+    const isCaptain=target.type===3;
+    // Knockback: 2 tiles for captain, 1 for regular guards, away from target
+    const kbDist=isCaptain?2:1;
+    const kbDx=Math.sign(pl.x-target.x),kbDy=Math.sign(pl.y-target.y);
+    for(let k=0;k<kbDist;k++){
+      const nx=pl.x+kbDx,ny=pl.y+kbDy;
+      if(nx<0||nx>=CO||ny<0||ny>=RO)break;
+      const nt=map[ny][nx];
+      if(nt===WL||nt===PL||trashedTiles[nx+','+ny])break;
+      pl.x=nx;pl.y=ny;
+    }
+    // Extended claw cooldown (can't spam-test)
+    clawCD=2000;
+    // Guard reacts — goes to chase
     target.vd=dirTo(target,pl.x,pl.y);
     target.sus=100;target.mode='chase';
     target.ls={x:pl.x,y:pl.y};target.at=700;
     afxs.push({x:target.x,y:target.y,t:700});
-    shake=150;haptic(60);wasDetected=true;combo=0;
-    // Alert nearby guards
+    shake=isCaptain?250:150;haptic(80);wasDetected=true;combo=0;
     ens.forEach(a=>{if(a!==target&&a.st<=0&&Math.abs(a.x-target.x)+Math.abs(a.y-target.y)<=8){a.mode='investigate';a.ls={x:pl.x,y:pl.y};a.inv=5000;a.sus=Math.min(a.sus+25,60);}});
-    showCodec('糟了！正面被發現！',1500);
+    showCodec(isCaptain?'被王隊長擋下！':'被反擊了！',1500);
   }else{
-    // Check adjacent trash can in facing direction
-    const dd=[[0,-1],[0,1],[-1,0],[1,0]][pl.dir];
+    // No guard hit — check for adjacent trash can (1 tile ahead only)
     const tx=pl.x+dd[0],ty=pl.y+dd[1];
     if(tx>=0&&tx<CO&&ty>=0&&ty<RO&&map[ty][tx]===TR&&!trashedTiles[tx+','+ty]){
-      // 🗑️ Tip trash can → banana peel
       sfx.trash();trashedTiles[tx+','+ty]=true;map[ty][tx]=P;shake=200;haptic(60);
       for(let i=1;i<=2;i++){const bx=tx+dd[0]*i,by=ty+dd[1]*i;if(bx>=0&&bx<CO&&by>=0&&by<RO&&map[by][bx]!==WL&&map[by][bx]!==PL){bananas.push({x:bx,y:by});break;}}
       showCodec('垃圾桶倒了！香蕉皮散落！',1500);addStyle(15,'香蕉陷阱！');
-      clawFX.push({x:tx,y:ty,t:300,dir:pl.dir});
     }else{
-      // 💨 Whiff — subtle swipe, shorter CD so it doesn't feel punishing
-      sfx.step();clawM(pl.x,pl.y);
-      clawFX.push({x:pl.x,y:pl.y,t:200,dir:pl.dir});
-      clawCD=CLAW_CD*0.35;
+      // 💨 Whiff
+      sfx.step();clawCD=CLAW_CD*0.35;
     }
   }
 }
-// Meow → ❤️ lure
-if(inp.meow&&meowCD<=0){meowCD=MEOW_CD;sfx.meow();meowR(pl.x,pl.y);meowDecoy={x:pl.x,y:pl.y,timer:5000};showCodec('喵～♡ 保全被萌到了！',1500);addStyle(10,'愛心誘引！');}
+// Reset clawHeld when released
+if(!inp.claw)pl.clawHeld=false;
 if(meowDecoy){meowDecoy.timer-=dt;if(meowDecoy.timer<=0)meowDecoy=null;}
 ens.forEach(e=>updateAI(e,dt));pts.forEach(p=>{p.l-=dt;p.x+=p.vx;p.y+=p.vy;p.vy+=.015;});pts=pts.filter(p=>p.l>0);afxs=afxs.filter(a=>{a.t-=dt;return a.t>0;});clawFX=clawFX.filter(f=>{f.t-=dt;return f.t>0;});pVis().forEach(({x,y})=>{if(y>=0&&y<RO&&x>=0&&x<CO)disc[y][x]=true;});
-inp.meow=false;if(!inp.claw)pl.clawHeld=false;inp.claw=false;if(!kd.ShiftLeft&&!kd.ShiftRight&&!document.querySelector('#bHide.on'))inp.hide=false;}
+if(!kd.ShiftLeft&&!kd.ShiftRight&&!document.querySelector('#bHide.on'))inp.hide=false;}
 
 // ══════ DRAW ══════
 function drawTile(x,y,t){const px=x*T,py=y*T;switch(t){
@@ -632,33 +977,75 @@ case PL:cx.fillStyle=((x+y)&1)?'#344426':'#3A4A2A';cx.fillRect(px,py,T,T);cx.fil
 case LT:cx.fillStyle='#4A5A38';cx.fillRect(px,py,T,T);break;
 case CP:cx.fillStyle=((x+y)&1)?'#5E3333':'#6B3A3A';cx.fillRect(px,py,T,T);break;
 case TR:cx.fillStyle=((x+y)&1)?'#344426':'#3A4A2A';cx.fillRect(px,py,T,T);cx.fillStyle='#666';cx.fillRect(px+8,py+6,16,22);cx.fillStyle='#888';cx.fillRect(px+6,py+4,20,4);cx.fillStyle='#555';cx.fillRect(px+10,py+10,4,14);cx.fillRect(px+18,py+10,4,14);cx.fillStyle='rgba(255,150,50,.35)';cx.font='7px "Press Start 2P"';cx.fillText('爪',px+6,py+30);break;
-case GM:{cx.fillStyle=((x+y)&1)?'#344426':'#3A4A2A';cx.fillRect(px,py,T,T);
-  const mbob=Math.sin(Date.now()/280+x*2)*3,pulse=0.5+0.5*Math.sin(Date.now()/180);
-  // Aura halo
-  cx.fillStyle=`rgba(255,215,0,${0.15+pulse*0.18})`;cx.beginPath();cx.arc(px+16,py+16+mbob,18,0,Math.PI*2);cx.fill();
-  cx.fillStyle=`rgba(255,240,120,${0.1+pulse*0.15})`;cx.beginPath();cx.arc(px+16,py+16+mbob,12,0,Math.PI*2);cx.fill();
-  // Mouse body (golden)
-  cx.fillStyle='#FFD700';cx.fillRect(px+9,py+14+mbob,14,9);
-  cx.fillStyle='#FFEE44';cx.fillRect(px+10,py+13+mbob,12,3);
-  // Head (left side, leading)
-  cx.fillStyle='#FFD700';cx.fillRect(px+6,py+15+mbob,6,7);
-  cx.fillStyle='#FFEE44';cx.fillRect(px+7,py+14+mbob,4,2);
-  // Ears (tiny round)
-  cx.fillStyle='#E0A810';cx.fillRect(px+5,py+12+mbob,3,3);cx.fillRect(px+9,py+11+mbob,3,3);
-  cx.fillStyle='#FFC0A0';cx.fillRect(px+6,py+13+mbob,1,1);cx.fillRect(px+10,py+12+mbob,1,1);
-  // Eye (single black dot)
-  cx.fillStyle='#000';cx.fillRect(px+8,py+16+mbob,1,1);
-  // Whiskers
-  cx.strokeStyle='rgba(255,255,255,0.6)';cx.lineWidth=1;
-  cx.beginPath();cx.moveTo(px+6,py+18+mbob);cx.lineTo(px+2,py+17+mbob);cx.stroke();
-  cx.beginPath();cx.moveTo(px+6,py+19+mbob);cx.lineTo(px+2,py+20+mbob);cx.stroke();
-  // Curly tail
-  cx.fillStyle='#E0A810';
-  cx.fillRect(px+23,py+18+mbob,2,2);cx.fillRect(px+25,py+16+mbob,2,2);cx.fillRect(px+27,py+17+mbob,2,2);cx.fillRect(px+26,py+19+mbob,2,2);
-  // Sparkles orbiting
-  for(let i=0;i<3;i++){const a=Date.now()/200+i*2.09;const sx=px+16+Math.cos(a)*14,sy=py+16+mbob+Math.sin(a)*7;cx.fillStyle='#FFF';cx.fillRect(sx,sy,2,2);}
-  // BONUS label
-  cx.fillStyle=`rgba(255,230,100,${0.7+0.2*pulse})`;cx.font='bold 7px "Press Start 2P"';cx.fillText('+50',px+8,py+30+mbob);
+case CN_B:case CN_S:case CN_G:{
+  // Floor base
+  cx.fillStyle=((x+y)&1)?'#344426':'#3A4A2A';cx.fillRect(px,py,T,T);
+  const bob=Math.sin(Date.now()/260+x)*2;
+  const pulse=0.6+0.4*Math.sin(Date.now()/240);
+  // Tier-specific color
+  let bodyCol,rimCol,glowCol,label;
+  if(t===CN_B){bodyCol='#B87333';rimCol='#8B4513';glowCol='rgba(200,120,60,';label='銅';}
+  else if(t===CN_S){bodyCol='#C0C0C0';rimCol='#808080';glowCol='rgba(220,220,255,';label='銀';}
+  else{bodyCol='#FFD700';rimCol='#B8860B';glowCol='rgba(255,220,80,';label='金';}
+  // Halo
+  cx.fillStyle=glowCol+(0.15+pulse*0.15)+')';cx.beginPath();cx.arc(px+16,py+16+bob,15,0,Math.PI*2);cx.fill();
+  // Can body (cylinder)
+  cx.fillStyle=bodyCol;cx.fillRect(px+9,py+10+bob,14,14);
+  cx.fillStyle=rimCol;cx.fillRect(px+9,py+8+bob,14,3);cx.fillRect(px+9,py+23+bob,14,2);
+  // Highlight
+  cx.fillStyle='rgba(255,255,255,0.35)';cx.fillRect(px+11,py+11+bob,2,12);
+  // Fish label
+  cx.fillStyle='#FFF';cx.font='bold 9px "Noto Sans TC",sans-serif';cx.fillText(label,px+12,py+21+bob);
+  // Sparkles for gold can
+  if(t===CN_G){
+    for(let i=0;i<2;i++){const a=Date.now()/200+i*3.14;const sx=px+16+Math.cos(a)*12,sy=py+16+bob+Math.sin(a)*8;cx.fillStyle=`rgba(255,255,180,${pulse})`;cx.fillRect(sx,sy,2,2);}
+  }
+  break;}
+case KEY:{
+  cx.fillStyle=((x+y)&1)?'#344426':'#3A4A2A';cx.fillRect(px,py,T,T);
+  const bob=Math.sin(Date.now()/200+x)*2,pu=0.5+0.5*Math.sin(Date.now()/150);
+  // Bright halo
+  const hg=cx.createRadialGradient(px+16,py+16+bob,2,px+16,py+16+bob,22);
+  hg.addColorStop(0,`rgba(255,220,80,${0.5+pu*0.3})`);
+  hg.addColorStop(1,'rgba(255,200,0,0)');
+  cx.fillStyle=hg;cx.fillRect(px-8,py-8,T+16,T+16);
+  // Key shape: circle head + shaft + teeth
+  cx.fillStyle='#FFD700';
+  cx.beginPath();cx.arc(px+11,py+14+bob,5,0,Math.PI*2);cx.fill();
+  cx.fillStyle='#1a1a1a';
+  cx.beginPath();cx.arc(px+11,py+14+bob,2,0,Math.PI*2);cx.fill();
+  cx.fillStyle='#FFD700';
+  cx.fillRect(px+15,py+13+bob,10,3);
+  cx.fillRect(px+22,py+16+bob,3,3);
+  cx.fillRect(px+18,py+16+bob,2,3);
+  cx.fillStyle='#FFEE88';cx.fillRect(px+9,py+12+bob,2,1); // shine
+  break;}
+case DOOR:{
+  cx.fillStyle=((x+y)&1)?'#344426':'#3A4A2A';cx.fillRect(px,py,T,T);
+  const pu=0.5+0.5*Math.sin(Date.now()/200);
+  // Door glow (only visible if player has key)
+  if(hasKey){
+    const dg=cx.createRadialGradient(px+16,py+16,2,px+16,py+16,T*1.2);
+    dg.addColorStop(0,`rgba(100,255,180,${0.35+pu*0.25})`);
+    dg.addColorStop(1,'rgba(0,255,100,0)');
+    cx.fillStyle=dg;cx.fillRect(px-T,py-T,T*3,T*3);
+  }
+  // Door frame
+  cx.fillStyle='#5a3a1a';cx.fillRect(px+3,py+2,26,28);
+  // Door body (wood)
+  cx.fillStyle='#8B5A2B';cx.fillRect(px+5,py+4,22,24);
+  cx.fillStyle='#6a4520';cx.fillRect(px+5,py+15,22,1);
+  // Door handle
+  cx.fillStyle='#FFD700';cx.fillRect(px+22,py+16,3,3);
+  // Locked padlock (if no key)
+  if(!hasKey){
+    cx.fillStyle='#333';cx.fillRect(px+12,py+13,8,8);
+    cx.fillStyle='#555';cx.fillRect(px+14,py+9,4,5);
+    cx.fillStyle='#FFD700';cx.fillRect(px+15,py+16,2,2);
+  }else{
+    // Unlocked: shows "開" label
+    cx.fillStyle=`rgba(100,255,180,${0.7+pu*0.3})`;cx.font='bold 10px "Noto Sans TC",sans-serif';cx.fillText('開',px+10,py+20);
+  }
   break;}
 }}
 
@@ -692,6 +1079,12 @@ if(safe&&!pl.hidden){cx.fillStyle=`rgba(0,255,100,${.5+.3*Math.sin(Date.now()/35
 if(idleTimer>2000){const uc=cans.filter(c=>!c.got);if(uc.length){let nr=uc[0],nd=999;uc.forEach(c=>{const d=Math.abs(c.x-pl.x)+Math.abs(c.y-pl.y);if(d<nd){nd=d;nr=c;}});const a=Math.atan2(nr.y-pl.y,nr.x-pl.x),p=.35+.35*Math.sin(Date.now()/300);cx.fillStyle=`rgba(255,215,0,${p})`;cx.beginPath();cx.arc(px+16+Math.cos(a)*20,py+12+Math.sin(a)*14,3.5,0,Math.PI*2);cx.fill();}}}
 
 function drawGuard(e){const px=e.x*T,py=e.y*T;
+  // Skip fully withdrawn guards
+  if(e.withdrawState==='withdrawn')return;
+  // Apply fade for withdrawing/returning
+  if(e.withdrawState==='withdrawing'||e.withdrawState==='returning'){
+    cx.globalAlpha=Math.max(0.1,e.withdrawFade);
+  }
 // ── Stunned by claw = curled up, torn clothes, shaking, stars ──
 if(e.st>0){
   const shk=Math.sin(Date.now()/60)*1.5;
@@ -771,55 +1164,139 @@ else if(e.type===0){cx.fillStyle='#FFFF88';cx.fillRect(px+15,py+2,2,2);}
 else{cx.fillStyle='#FFD700';cx.fillRect(px+14,py+1,4,3);}
 cx.fillStyle='#8B6914';cx.fillRect(px+8,py+24,5,4);cx.fillRect(px+19,py+24,5,4);
 cx.fillStyle='#888';const fhx=e.vd===3?px+26:e.vd===2?px-2:px+22,fhy=e.vd===0?py+8:py+16;cx.fillRect(fhx,fhy,4,6);cx.fillStyle='#FFD700';cx.fillRect(fhx,fhy,4,2);
+// 🔑 Captain carries key after gold can taken (until he's stunned)
+if(e.type===3&&canPhase>=3&&!hasKey&&e.st<=0){
+  // Red hunter-mode aura (phase 3 only — 1v1 boss fight)
+  const auraP=0.6+0.4*Math.sin(Date.now()/240);
+  const ag=cx.createRadialGradient(px+T/2,py+T/2,4,px+T/2,py+T/2,T*1.2);
+  ag.addColorStop(0,`rgba(255,50,50,${0.3*auraP})`);
+  ag.addColorStop(0.6,`rgba(255,30,30,${0.1*auraP})`);
+  ag.addColorStop(1,'rgba(255,0,0,0)');
+  cx.fillStyle=ag;cx.fillRect(px-T,py-T,T*3,T*3);
+  // Key icon
+  const kbob=Math.sin(Date.now()/220)*2,pu=0.6+0.4*Math.sin(Date.now()/180);
+  cx.fillStyle=`rgba(255,220,60,${0.4+pu*0.3})`;cx.beginPath();cx.arc(px+16,py-10+kbob,9,0,Math.PI*2);cx.fill();
+  cx.fillStyle='#FFD700';
+  cx.beginPath();cx.arc(px+13,py-9+kbob,2.5,0,Math.PI*2);cx.fill();
+  cx.fillStyle='#1a1a1a';cx.beginPath();cx.arc(px+13,py-9+kbob,1,0,Math.PI*2);cx.fill();
+  cx.fillStyle='#FFD700';cx.fillRect(px+15,py-10+kbob,6,1);cx.fillRect(px+19,py-8+kbob,2,2);
+  // Crossed swords ⚔ icon above (boss indicator)
+  cx.fillStyle=`rgba(255,80,80,${0.7+pu*0.3})`;cx.font='bold 11px "Noto Sans TC",sans-serif';
+  cx.fillText('⚔',px+6,py-22+kbob);
+}
 // Scan effect — small spinning icon when actively scanning investigate point
 if(e.scanT>0){const sa=(1200-e.scanT)/1200;cx.fillStyle=`rgba(255,180,50,${0.6+0.4*Math.sin(Date.now()/100)})`;cx.font='bold 9px "Press Start 2P"';cx.fillText('👁',px+10,py-4);}
+// Guard name label (small, above head) — helps player identify archetypes
+if(e.st<=0&&e.slideT<=0&&e.petT<=0){
+  const nameCol=e.type===3?'#ff88ff':e.type===2?'#ffaa66':e.type===1?'#88aaff':'#aaffaa';
+  cx.fillStyle='rgba(0,0,0,0.7)';cx.font='bold 9px "Noto Sans TC",sans-serif';
+  cx.fillText(e.name,px-3,py-13);
+  cx.fillStyle=nameCol;cx.fillText(e.name,px-4,py-14);
+}
 // ❤️ when investigating meow
 if(e.mode==='investigate'&&meowDecoy){cx.fillStyle='#FF66AA';cx.font='10px "Press Start 2P"';cx.fillText('❤️',px+8,py-6);}
 if(e.mode==='investigate'&&e.st<=0&&e.slideT<=0){const p=.5+.5*Math.sin(Date.now()/120);cx.globalAlpha=p;cx.fillStyle='#FFAA00';cx.font='22px "Press Start 2P"';cx.fillText('?',px+8,py-10);cx.globalAlpha=1;}
 if(e.sus>5&&e.mode!=='patrol'){cx.fillStyle=e.sus>=80?'#FF0000':e.sus>=30?'#FFAA00':'#88FF88';cx.fillRect(px+2,py-5,Math.round(e.sus/100*28),4);}
-const af=afxs.find(a=>a.x===e.x&&a.y===e.y);if(af){const sc=Math.min(1,af.t/350);cx.fillStyle='#FF0000';cx.font=`${26+14*sc}px "Press Start 2P"`;cx.fillText('!',px+6,py-16-14*(1-sc));}}
+const af=afxs.find(a=>a.x===e.x&&a.y===e.y);if(af){const sc=Math.min(1,af.t/350);cx.fillStyle='#FF0000';cx.font=`${26+14*sc}px "Press Start 2P"`;cx.fillText('!',px+6,py-16-14*(1-sc));}
+cx.globalAlpha=1;}
 
-function drawFlash(e){if(e.st>0||e.slideT>0||e.petT>0||e.boxPause>0)return;const flash=getFlash(e),set=new Set();flash.forEach(t=>set.add(t.y*CO+t.x));let fR=255,fG=230,fB=80,bR=255,bG=210,bB=50;if(e.mode==='chase'){fR=255;fG=80;fB=60;bR=255;bG=60;bB=40;}else if(e.mode==='investigate'){fR=255;fG=180;fB=50;bR=255;bG=160;bB=30;}const fl=e.mode==='investigate'?(.7+.3*Math.sin(Date.now()/80)):e.mode==='chase'?(.85+.15*Math.sin(Date.now()/50)):1;flash.forEach(t=>{const alpha=Math.max(.06,.30-t.dist*.025)*fl;cx.fillStyle=`rgba(${fR},${fG},${fB},${alpha})`;cx.fillRect(t.x*T,t.y*T,T,T);cx.strokeStyle=`rgba(${bR},${bG},${bB},${.45*fl})`;cx.lineWidth=1.5;if(!set.has((t.y-1)*CO+t.x)){cx.beginPath();cx.moveTo(t.x*T,t.y*T);cx.lineTo(t.x*T+T,t.y*T);cx.stroke();}if(!set.has((t.y+1)*CO+t.x)){cx.beginPath();cx.moveTo(t.x*T,t.y*T+T);cx.lineTo(t.x*T+T,t.y*T+T);cx.stroke();}if(!set.has(t.y*CO+(t.x-1))){cx.beginPath();cx.moveTo(t.x*T,t.y*T);cx.lineTo(t.x*T,t.y*T+T);cx.stroke();}if(!set.has(t.y*CO+(t.x+1))){cx.beginPath();cx.moveTo(t.x*T+T,t.y*T);cx.lineTo(t.x*T+T,t.y*T+T);cx.stroke();}});}
+function drawFlash(e){
+  if(e.st>0||e.slideT>0||e.petT>0||e.boxPause>0)return;
+  if(e.withdrawState==='withdrawn'||e.withdrawState==='withdrawing'||e.withdrawState==='returning')return;
+  // Captain phase 3: no cone, he uses whip instead
+  if(e.type===3&&canPhase===3&&!hasKey)return;
+  // Phase 4: chasers don't show cones, they're pure collision
+  if(canPhase===4)return;
+  const flash=getFlash(e),set=new Set();flash.forEach(t=>set.add(t.y*CO+t.x));
+  let fR=255,fG=230,fB=80,bR=255,bG=210,bB=50;
+  if(e.mode==='chase'){fR=255;fG=80;fB=60;bR=255;bG=60;bB=40;}
+  else if(e.mode==='investigate'){fR=255;fG=180;fB=50;bR=255;bG=160;bB=30;}
+  const fl=e.mode==='investigate'?(.7+.3*Math.sin(Date.now()/80)):e.mode==='chase'?(.85+.15*Math.sin(Date.now()/50)):1;
+  flash.forEach(t=>{const alpha=Math.max(.06,.30-t.dist*.025)*fl;cx.fillStyle=`rgba(${fR},${fG},${fB},${alpha})`;cx.fillRect(t.x*T,t.y*T,T,T);cx.strokeStyle=`rgba(${bR},${bG},${bB},${.45*fl})`;cx.lineWidth=1.5;if(!set.has((t.y-1)*CO+t.x)){cx.beginPath();cx.moveTo(t.x*T,t.y*T);cx.lineTo(t.x*T+T,t.y*T);cx.stroke();}if(!set.has((t.y+1)*CO+t.x)){cx.beginPath();cx.moveTo(t.x*T,t.y*T+T);cx.lineTo(t.x*T+T,t.y*T+T);cx.stroke();}if(!set.has(t.y*CO+(t.x-1))){cx.beginPath();cx.moveTo(t.x*T,t.y*T);cx.lineTo(t.x*T,t.y*T+T);cx.stroke();}if(!set.has(t.y*CO+(t.x+1))){cx.beginPath();cx.moveTo(t.x*T+T,t.y*T);cx.lineTo(t.x*T+T,t.y*T+T);cx.stroke();}});
+}
 
 function drawDecoy(){if(!meowDecoy)return;const px=meowDecoy.x*T,py=meowDecoy.y*T,p=.3+.4*Math.sin(Date.now()/120);cx.strokeStyle=`rgba(255,100,150,${p*.6})`;cx.lineWidth=1.5;const r=8+Math.sin(Date.now()/200)*4;for(let i=0;i<3;i++){cx.beginPath();cx.arc(px+T/2,py+T/2,r+i*7,0,Math.PI*2);cx.stroke();}cx.fillStyle=`rgba(255,100,150,${p})`;cx.font='10px "Press Start 2P"';cx.fillText('♡',px+10,py+T/2+4);}
 function drawBananas(){bananas.forEach(b=>{const px=b.x*T,py=b.y*T;cx.fillStyle='#FFD700';cx.fillRect(px+10,py+12,12,4);cx.fillRect(px+8,py+14,4,6);cx.fillRect(px+20,py+10,4,6);cx.fillStyle='#AA8800';cx.fillRect(px+14,py+16,4,4);});}
 function drawClawFX(){clawFX.forEach(f=>{
   const px=f.x*T,py=f.y*T;
-  const life=f.t/400;const alpha=Math.min(1,life*2);
-  cx.globalAlpha=alpha;
-  // Three angled claw slashes — direction aware
-  cx.strokeStyle='#FFFFFF';cx.lineWidth=3;
-  cx.lineCap='round';
+  const maxT=f.maxT||400;
+  const life=f.t/maxT; // 1→0 as it fades
+  const alpha=Math.min(1,life*1.8);
   const cx0=px+T/2,cy0=py+T/2;
-  // Offset slashes based on direction for visual clarity
   const dirOff=[[0,-1],[0,1],[-1,0],[1,0]][f.dir];
-  const ox=dirOff[0]*6,oy=dirOff[1]*6;
+  const isHoriz=f.dir===2||f.dir===3;
+
+  // ── Layer 1: Impact halo — radial burst, very bright on first frames ──
+  const haloSize=14+(1-life)*10; // expands outward
+  const hg=cx.createRadialGradient(cx0,cy0,2,cx0,cy0,haloSize);
+  hg.addColorStop(0,`rgba(255,255,255,${alpha*0.55})`);
+  hg.addColorStop(0.4,`rgba(180,230,255,${alpha*0.35})`);
+  hg.addColorStop(1,'rgba(100,180,255,0)');
+  cx.fillStyle=hg;cx.fillRect(cx0-haloSize,cy0-haloSize,haloSize*2,haloSize*2);
+
+  cx.globalAlpha=alpha;
+
+  // ── Layer 2: Outer shadow slashes (behind, thicker, darker — silhouette) ──
+  cx.strokeStyle='rgba(0,0,0,0.55)';cx.lineWidth=7;cx.lineCap='round';
   for(let i=0;i<3;i++){
-    const off=(i-1)*5;
+    const off=(i-1)*6;
     cx.beginPath();
-    if(f.dir===2||f.dir===3){ // horizontal swipe
-      cx.moveTo(cx0+ox-6,cy0+off-4);
-      cx.lineTo(cx0+ox+6,cy0+off+4);
-    }else{ // vertical swipe
-      cx.moveTo(cx0+off-4,cy0+oy-6);
-      cx.lineTo(cx0+off+4,cy0+oy+6);
-    }
+    if(isHoriz){cx.moveTo(cx0-10,cy0+off-6);cx.lineTo(cx0+10,cy0+off+6);}
+    else{cx.moveTo(cx0+off-6,cy0-10);cx.lineTo(cx0+off+6,cy0+10);}
     cx.stroke();
   }
-  // Red inner glow on slashes
-  cx.strokeStyle='#FF4466';cx.lineWidth=1.2;
+
+  // ── Layer 3: Main white slashes (thick, bright) ──
+  cx.strokeStyle='#FFFFFF';cx.lineWidth=5;cx.lineCap='round';
   for(let i=0;i<3;i++){
-    const off=(i-1)*5;
+    const off=(i-1)*6;
     cx.beginPath();
-    if(f.dir===2||f.dir===3){
-      cx.moveTo(cx0+ox-6,cy0+off-4);
-      cx.lineTo(cx0+ox+6,cy0+off+4);
-    }else{
-      cx.moveTo(cx0+off-4,cy0+oy-6);
-      cx.lineTo(cx0+off+4,cy0+oy+6);
-    }
+    if(isHoriz){cx.moveTo(cx0-10,cy0+off-6);cx.lineTo(cx0+10,cy0+off+6);}
+    else{cx.moveTo(cx0+off-6,cy0-10);cx.lineTo(cx0+off+6,cy0+10);}
     cx.stroke();
   }
+
+  // ── Layer 4: Inner bright cyan core (makes it glow like a blade) ──
+  cx.strokeStyle='#AAEEFF';cx.lineWidth=2.5;
+  for(let i=0;i<3;i++){
+    const off=(i-1)*6;
+    cx.beginPath();
+    if(isHoriz){cx.moveTo(cx0-10,cy0+off-6);cx.lineTo(cx0+10,cy0+off+6);}
+    else{cx.moveTo(cx0+off-6,cy0-10);cx.lineTo(cx0+off+6,cy0+10);}
+    cx.stroke();
+  }
+
+  // ── Layer 5: Red blood streaks on top (thin, sharp) ──
+  cx.strokeStyle='#FF3355';cx.lineWidth=1.5;
+  for(let i=0;i<3;i++){
+    const off=(i-1)*6;
+    cx.beginPath();
+    if(isHoriz){cx.moveTo(cx0-10,cy0+off-6);cx.lineTo(cx0+10,cy0+off+6);}
+    else{cx.moveTo(cx0+off-6,cy0-10);cx.lineTo(cx0+off+6,cy0+10);}
+    cx.stroke();
+  }
+
+  // ── Layer 6: Spark particles radiating outward (early frames only) ──
+  if(life>0.5){
+    const sparkCount=6;
+    for(let i=0;i<sparkCount;i++){
+      const angle=(i/sparkCount)*Math.PI*2+(1-life)*2;
+      const dist=(1-life)*16+4;
+      const sx=cx0+Math.cos(angle)*dist,sy=cy0+Math.sin(angle)*dist;
+      cx.fillStyle=`rgba(255,255,200,${alpha*0.8})`;
+      cx.fillRect(sx-1,sy-1,2,2);
+    }
+  }
+
+  // ── Layer 7: Direction indicator — bright arrow from center ──
+  if(life>0.4){
+    cx.strokeStyle=`rgba(255,255,255,${alpha})`;cx.lineWidth=2;
+    cx.beginPath();
+    cx.moveTo(cx0-dirOff[0]*8,cy0-dirOff[1]*8);
+    cx.lineTo(cx0+dirOff[0]*8,cy0+dirOff[1]*8);
+    cx.stroke();
+  }
+
   cx.lineWidth=1;cx.lineCap='butt';cx.globalAlpha=1;
 });}
 function drawTrashed(){for(const key in trashedTiles){const[tx,ty]=key.split(',').map(Number),px=tx*T,py=ty*T;cx.fillStyle='#555';cx.fillRect(px+2,py+12,12,6);cx.fillRect(px+16,py+16,10,4);cx.fillStyle='#444';cx.fillRect(px+10,py+22,14,4);}}
@@ -860,13 +1337,139 @@ function drawCodec(){if(codect<=0)return;
   if(line2)cx.fillText(line2,textX,by+60);
   cx.globalAlpha=1;
 }
-function drawHUD(){const got=cans.filter(c=>c.got).length,t=Math.ceil(timer),mcd=Math.ceil(meowCD/1000);if(got!==prevHC){prevHC=got;$('canBox').innerHTML=`🥫 <b style="color:#fff;font-size:14px">${got}</b>/3`;}if(t!==prevHT){prevHT=t;$('timerBox').textContent=t;}$('timerBox').style.color=timer<=15?(Math.sin(Date.now()/200)>.3?'#ff2222':'#ff8844'):'#ff6644';if(styleScore!==prevHS){prevHS=styleScore;$('scoreBox').textContent=`⭐ ${styleScore}`;}
+function drawHUD(){const got=cans.filter(c=>c.got).length,t=Math.ceil(timer),mcd=Math.ceil(meowCD/1000);
+  // Tiered progression display: 🟫→🥈→🥇→🔑
+  const phaseDisplay=hasKey?'✓✓✓ 🔑':canPhase>=3?'✓✓✓ ⏳🔑':canPhase===2?'✓✓ 🥇':canPhase===1?'✓ 🥈':'🟫';
+  if(got!==prevHC||canPhase!==pl._phCache){prevHC=got;pl._phCache=canPhase;$('canBox').innerHTML=`<span style="color:#fff;font-size:12px">${phaseDisplay}</span>`;}
+  if(t!==prevHT){prevHT=t;$('timerBox').textContent=t;}$('timerBox').style.color=timer<=15?(Math.sin(Date.now()/200)>.3?'#ff2222':'#ff8844'):'#ff6644';if(styleScore!==prevHS){prevHS=styleScore;$('scoreBox').textContent=`⭐ ${styleScore}`;}
 // Meow CD
-if(mcd!==prevHM){prevHM=mcd;const mb=$('bMeow');if(meowCD>0){mb.classList.add('cd');let ov=mb.querySelector('.cdov');if(!ov){ov=document.createElement('span');ov.className='cdov';mb.appendChild(ov);}ov.textContent=mcd+'s';}else{mb.classList.remove('cd');const ov=mb.querySelector('.cdov');if(ov)ov.remove();}}
+if(mcd!==prevHM){prevHM=mcd;}
 // Claw CD
 const ccd=Math.ceil(clawCD/1000);const cb=$('bClaw');if(clawCD>0){cb.classList.add('cd');let ov=cb.querySelector('.cdov');if(!ov){ov=document.createElement('span');ov.className='cdov';cb.appendChild(ov);}ov.textContent=ccd+'s';}else{cb.classList.remove('cd');const ov=cb.querySelector('.cdov');if(ov)ov.remove();}}
 
-function render(){cx.save();if(shake>0)cx.translate((Math.random()-.5)*7,(Math.random()-.5)*7);cx.fillStyle='#030303';cx.fillRect(0,0,MW,MH);for(let y=0;y<RO;y++)for(let x=0;x<CO;x++)drawTile(x,y,map[y][x]);drawTrashed();drawBananas();drawFog();ens.forEach(drawFlash);drawDecoy();drawCat();ens.forEach(drawGuard);drawClawFX();drawPts();drawCodec();cx.fillStyle='rgba(25,50,15,.04)';cx.fillRect(0,0,MW,MH);cx.restore();drawHUD();}
+function drawWhip(){
+  ens.forEach(e=>{
+    if(e.type!==3||canPhase!==3||hasKey)return;
+    if(e.whipState==='idle'||e.withdrawState!=='active')return;
+    const dd=[[0,-1],[0,1],[-1,0],[1,0]][e.whipDir];
+    const ex=e.x*T+T/2,ey=e.y*T+T/2;
+    if(e.whipState==='aiming'){
+      // Red dashed telegraph line, pulsing
+      const progress=1-e.whipT/800; // 0 → 1
+      const pulse=0.6+0.4*Math.sin(Date.now()/60);
+      cx.strokeStyle=`rgba(255,40,40,${0.6+pulse*0.3})`;
+      cx.lineWidth=4+progress*2;
+      cx.setLineDash([8,6]);cx.lineDashOffset=-Date.now()/40;
+      cx.beginPath();
+      cx.moveTo(ex,ey);
+      cx.lineTo(ex+dd[0]*T*4,ey+dd[1]*T*4);
+      cx.stroke();
+      cx.setLineDash([]);
+      // Warning tiles (1-4 ahead) — red tint intensifies
+      for(let d=1;d<=4;d++){
+        const tx=e.x+dd[0]*d,ty=e.y+dd[1]*d;
+        if(tx<0||tx>=CO||ty<0||ty>=RO)break;
+        if(map[ty][tx]===WL||map[ty][tx]===PL)break;
+        cx.fillStyle=`rgba(255,30,30,${0.15+progress*0.25+pulse*0.1})`;
+        cx.fillRect(tx*T,ty*T,T,T);
+      }
+      // "!" warning above captain
+      cx.fillStyle=`rgba(255,60,60,${0.8+pulse*0.2})`;
+      cx.font='bold 20px "Press Start 2P"';
+      cx.fillText('!',ex-4,ey-T-6);
+    }else if(e.whipState==='striking'){
+      // Solid red chain whip
+      const flash=e.whipT/200;
+      cx.strokeStyle=`rgba(255,60,60,${flash})`;cx.lineWidth=9;cx.lineCap='round';
+      cx.beginPath();
+      cx.moveTo(ex,ey);
+      cx.lineTo(ex+dd[0]*T*4,ey+dd[1]*T*4);
+      cx.stroke();
+      // Inner bright core
+      cx.strokeStyle=`rgba(255,220,160,${flash})`;cx.lineWidth=4;
+      cx.beginPath();
+      cx.moveTo(ex,ey);
+      cx.lineTo(ex+dd[0]*T*4,ey+dd[1]*T*4);
+      cx.stroke();
+      // Chain links along the whip
+      for(let d=1;d<=4;d++){
+        const lx=ex+dd[0]*T*(d-0.5),ly=ey+dd[1]*T*(d-0.5);
+        cx.fillStyle=`rgba(180,30,30,${flash})`;
+        cx.beginPath();cx.arc(lx,ly,4,0,Math.PI*2);cx.fill();
+        cx.fillStyle=`rgba(255,180,120,${flash*0.8})`;
+        cx.beginPath();cx.arc(lx,ly,2,0,Math.PI*2);cx.fill();
+      }
+      cx.lineCap='butt';
+    }else if(e.whipState==='recovery'){
+      // Faint recovery indicator — short pulse showing vulnerability
+      const pu=0.4+0.3*Math.sin(Date.now()/100);
+      cx.fillStyle=`rgba(100,255,100,${pu})`;
+      cx.font='bold 12px "Noto Sans TC",sans-serif';
+      cx.fillText('破綻！',e.x*T-4,e.y*T-T-2);
+    }
+  });
+}
+function drawCompass(){
+  // Find the current objective: nearest non-got can, or key, or door
+  let target=null;
+  if(hasKey&&chosenDoor){target={x:chosenDoor.x,y:chosenDoor.y,emoji:'🚪'};}
+  else{
+    // Key dropped by captain?
+    for(let r=0;r<RO&&!target;r++)for(let c=0;c<CO&&!target;c++){if(map[r][c]===KEY)target={x:c,y:r,emoji:'🔑'};}
+    if(!target){
+      // Nearest can
+      const avail=cans.filter(c=>!c.got);
+      if(avail.length){
+        const nearest=avail.reduce((a,b)=>((Math.abs(a.x-pl.x)+Math.abs(a.y-pl.y))<(Math.abs(b.x-pl.x)+Math.abs(b.y-pl.y))?a:b));
+        const emoji=nearest.tier==='bronze'?'🟫':nearest.tier==='silver'?'🥈':'🥇';
+        target={x:nearest.x,y:nearest.y,emoji};
+      }
+    }
+  }
+  if(!target)return;
+  // Check if target is in player's visible area (within ~4.5 tiles) — if so, don't show compass
+  const dx=target.x-pl.x,dy=target.y-pl.y;
+  const dist=Math.sqrt(dx*dx+dy*dy);
+  if(dist<=4.5)return;
+  // Project arrow position onto screen edge in direction of target
+  // Player screen position
+  const plScreenX=pl.x*T+T/2,plScreenY=pl.y*T+T/2;
+  // Angle from player to target
+  const ang=Math.atan2(dy,dx);
+  // Distance from player position to screen edge in that angle
+  const margin=44;
+  const maxX=MW-margin,maxY=MH-margin,minX=margin,minY=margin;
+  // Parametric line from player, find t where it exits the screen bounds
+  const ex=Math.cos(ang),ey=Math.sin(ang);
+  let tMax=Infinity;
+  if(ex>0.01)tMax=Math.min(tMax,(maxX-plScreenX)/ex);
+  if(ex<-0.01)tMax=Math.min(tMax,(minX-plScreenX)/ex);
+  if(ey>0.01)tMax=Math.min(tMax,(maxY-plScreenY)/ey);
+  if(ey<-0.01)tMax=Math.min(tMax,(minY-plScreenY)/ey);
+  const arrowX=plScreenX+ex*tMax,arrowY=plScreenY+ey*tMax;
+  const pulse=0.7+0.3*Math.sin(Date.now()/200);
+  // Dark backdrop circle
+  cx.fillStyle=`rgba(0,0,0,${0.6+pulse*0.2})`;
+  cx.beginPath();cx.arc(arrowX,arrowY,18,0,Math.PI*2);cx.fill();
+  // Gold ring
+  cx.strokeStyle=`rgba(255,215,0,${0.7+pulse*0.3})`;cx.lineWidth=2;
+  cx.beginPath();cx.arc(arrowX,arrowY,17,0,Math.PI*2);cx.stroke();
+  // Small arrow (triangle) pointing toward target
+  cx.save();
+  cx.translate(arrowX,arrowY);cx.rotate(ang);
+  cx.fillStyle=`rgba(255,215,0,${pulse})`;
+  cx.beginPath();
+  cx.moveTo(10,0);cx.lineTo(-4,-6);cx.lineTo(-4,6);cx.closePath();cx.fill();
+  cx.restore();
+  // Emoji indicator above circle
+  cx.fillStyle='#fff';cx.font='14px sans-serif';cx.textAlign='center';
+  cx.fillText(target.emoji,arrowX,arrowY-20);
+  cx.textAlign='start';
+  // Distance text below
+  cx.fillStyle=`rgba(255,215,0,${pulse})`;cx.font='bold 10px "Press Start 2P"';
+  cx.fillText(Math.floor(dist)+'m',arrowX-12,arrowY+32);
+}
+function render(){cx.save();if(shake>0)cx.translate((Math.random()-.5)*7,(Math.random()-.5)*7);cx.fillStyle='#030303';cx.fillRect(0,0,MW,MH);for(let y=0;y<RO;y++)for(let x=0;x<CO;x++)drawTile(x,y,map[y][x]);drawTrashed();drawBananas();drawFog();ens.forEach(drawFlash);drawDecoy();drawCat();ens.forEach(drawGuard);drawWhip();drawClawFX();drawPts();drawCompass();drawCodec();cx.fillStyle='rgba(25,50,15,.04)';cx.fillRect(0,0,MW,MH);cx.restore();drawHUD();}
 
 // Title walking cat + win cat head state
 let eyeCV,eyeCX;
@@ -1185,27 +1788,169 @@ function drawWinCat(dt){if(!winCV)return;const w=winCV.width,h=winCV.height,ctx=
 function showOv(){const ov=$('ov'),ct=$('ovc');ov.classList.remove('hide');
 if(ovLastState===gs)return; // only rebuild DOM on state transition
 ovLastState=gs;
-if(gs==='title'){const best=getBest();ct.innerHTML=`<canvas id="eyeC" width="240" height="90" style="display:block;margin:0 auto 8px;image-rendering:auto;"></canvas><h1>天玉街の黑吉</h1><h2>— 貓 爪 伏 擊 版 —</h2>${best?`<p class="best">🏆 最高：${best}分</p>`:''}<div class="sinfo"><p><span class="k">📦</span> 紙箱偽裝 — 任何地方隱身</p><p><span class="k">🐾</span> 貓爪 — 🥷 背刺保全！2.5s CD</p><p><span class="k">😻</span> 喵叫 — ❤️ 引保全蹲下摸貓</p></div><p class="tip">🐁 黃金老鼠 — 拿到 +50分 +10秒（位置危險！）</p><p class="tip">👮 4 種保全：🟢新人 🔵老陳 🟠阿勇 🟣隊長</p><p class="tip">⚠️ 隊長發現你會廣播全員！</p><p class="tip">🥷 相鄰+視線外=大暈眩5秒｜正面=硬直1秒</p><p class="tip">🗑️ 面對垃圾桶按爪→香蕉皮→保全滑壘</p><p class="tip">🌺 盆栽旁=SAFE ｜ 🧠 保全會記住你，偶爾回去探查</p><p class="tip">⌨️ 方向鍵/WASD 移動 ｜ <b style="color:#ffcc66">SPACE=爪</b> SHIFT=箱 E=喵</p><p class="tip">📱 左下方向鍵 D-pad ｜ 右下技能按鈕</p><p class="tip" style="color:#ffcc66">🎮 按 SPACE / ENTER 開始</p><div class="btn" id="startBtn">開始偷襲</div>`;eyeCV=$('eyeC');eyeCX=eyeCV.getContext('2d');tcX=eyeCV.width+30;tcFrame=0;tcFrameT=0;tcPause=0;tcPauseMax=0;tcPassed=false;tcBlink=0;tcBlinkT=0;tcNextBlink=1800;$('startBtn').addEventListener('click',startGame);$('startBtn').addEventListener('touchend',e=>{e.preventDefault();startGame();});}
-else if(gs==='gameover'){const got=cans.filter(c=>c.got).length;ct.innerHTML=`<h1>被抓到了！</h1><h2>黑吉被保全逮住了...</h2><p style="font-size:12px;color:#ccc;">🥫 ${got}/3 ⭐ ${styleScore}分 🐾 伏擊${knockCount}次</p><div class="btn" id="retryBtn">再試一次</div>`;$('retryBtn').addEventListener('click',startGame);$('retryBtn').addEventListener('touchend',e=>{e.preventDefault();startGame();});}
+if(gs==='title'){const best=getBest();ct.innerHTML=`<canvas id="eyeC" width="240" height="90" style="display:block;margin:0 auto 8px;image-rendering:auto;"></canvas><h1>天玉街の黑磯</h1><h2>— 深夜盜罐頭傳說 —</h2>${best?`<p class="best">🏆 最高：${best}分</p>`:''}
+<p class="ending-line" style="color:#aaa;margin:8px 0;">紅磚深巷的王者，今夜挑戰傳說級金罐頭，從鐵壁衛士的眼皮下全身而退。</p>
+<div class="panel" id="storyPanel"><div class="panel-head" data-panel="storyPanel"><span>📖 完整故事</span><span class="arr">▶</span></div><div class="panel-body">
+<p class="story-beat"><b>深夜 00:00</b><br>台北天玉街，紅磚深巷，鐘樓響起。</p>
+<p class="story-beat"><b>天玉街の黑磯</b><br>非富即貴的住戶眼中，這裡是豪門地盤。<br>但對黑磯來說⸺ 這條巷子，是他的王國。</p>
+<p class="story-beat"><b>鐵壁衛士</b><br>受過專業訓練的夜班保全：<br>新人、老手、菁英、隊長⸺ 連蚊子都飛不進去。</p>
+<p class="story-beat"><b>究極金罐頭</b><br>傳說中的珍饈，連最挑食的黑磯都無法抗拒。<br>今晚，銅、銀、金⸺ 三罐依序到手。</p>
+<p class="story-beat"><b>戰術博弈開始</b><br>潛行、背刺、撿鑰匙、開門。<br>天玉街の影子，現身。</p>
+</div></div>
+<div class="panel" id="helpPanel"><div class="panel-head" data-panel="helpPanel"><span>🎮 操作說明</span><span class="arr">▶</span></div><div class="panel-body">
+<div class="sinfo"><p><span class="k">📦</span> 紙箱偽裝 — 任何地方隱身</p><p><span class="k">🐾</span> 貓爪 — 按下即攻擊（直線 3 格）</p></div>
+<p class="tip">🟫 銅罐頭 → 🥈 銀罐頭 → 🥇 金罐頭 → 🔑 鑰匙 → 🚪 門</p>
+<p class="tip">👮 四位保全：🟢小林(笨) 🔵陳師傅(穩) 🟠阿勇(兇) 🟣王隊長(Boss)</p>
+<p class="tip">⚠️ 每拿一罐，保全會升級警戒</p>
+<p class="tip">🥷 相鄰+視線外=大暈眩｜正面=硬直</p>
+<p class="tip">🌺 盆栽旁=SAFE ｜ 🧠 保全會記住你</p>
+<p class="tip">⌨️ 方向鍵/WASD｜<b style="color:#ffcc66">SPACE=爪</b> SHIFT=箱</p>
+</div></div>
+<p class="tip" style="color:#ffcc66;margin-top:10px;">🎮 按 SPACE / ENTER 開始</p><div class="btn" id="startBtn">開始偷襲</div>`;
+  eyeCV=$('eyeC');eyeCX=eyeCV.getContext('2d');tcX=eyeCV.width+30;tcFrame=0;tcFrameT=0;tcPause=0;tcPauseMax=0;tcPassed=false;tcBlink=0;tcBlinkT=0;tcNextBlink=1800;
+  document.querySelectorAll('.panel-head').forEach(h=>{h.addEventListener('click',e=>{e.stopPropagation();const p=document.getElementById(h.dataset.panel);p.classList.toggle('open');});});
+  $('startBtn').addEventListener('click',startGame);$('startBtn').addEventListener('touchend',e=>{e.preventDefault();startGame();});
+}
+else if(gs==='gameover'){const got=cans.filter(c=>c.got).length;
+  // Pick flavor text based on what happened
+  let flavor='';
+  if(got===0)flavor='今晚白忙一場。明晚，黑吉決定換條路試試。';
+  else if(got<3)flavor=`只偷到 ${got} 罐，沒能全身而退...`;
+  else flavor='拿到罐頭卻沒找到出口？真可惜。';
+  ct.innerHTML=`<h1>被關進紙箱...</h1><h2>明晚再試一次。</h2><p class="ending-line" style="color:#aaa;">${flavor}</p><p style="font-size:12px;color:#ccc;margin-top:10px;">🥫 ${got}/3 ⭐ ${styleScore}分 🐾 伏擊${knockCount}次</p><div class="btn" id="retryBtn">再試一次</div>`;
+  $('retryBtn').addEventListener('click',startGame);$('retryBtn').addEventListener('touchend',e=>{e.preventDefault();startGame();});}
 else if(gs==='win'){let g='C';if(styleScore>=150)g='S+';else if(styleScore>=100)g='S';else if(styleScore>=60)g='A';else if(styleScore>=30)g='B';
 let title='';
-if(goldenMouseGot&&!wasDetected&&knockCount===0)title='👑 天玉街の傳說';
-else if(goldenMouseGot&&!wasDetected)title='🐁 完美獵鼠人';
+if(!wasDetected&&knockCount===0)title='👑 天玉街の傳說';
 else if(!wasDetected&&knockCount>=3)title='🥷 刺客信條';
 else if(!wasDetected)title='👤 天玉街の影子';
 else if(knockCount>=4)title='💪 全員制裁者';
 else if(knockCount>=3)title='🥊 保全剋星';
-else if(goldenMouseGot)title='🐁 黃金賊王';
 else if(timer<=3)title='⚡ 極限運動貓';
 else if(combo>=3)title='🎯 罐頭獵人';
 else if(styleScore>=120)title='🌟 潛行大師';
 const best=getBest();const isNew=styleScore>best;if(isNew&&styleScore>0)setBest(styleScore);
-ct.innerHTML=`<canvas id="winC" width="180" height="150" style="display:block;margin:0 auto 4px;image-rendering:auto;"></canvas><h1>逃脫成功！</h1>${title?`<p class="title-tag">${title}</p>`:''}<p style="font-size:18px;color:#f0c040;margin:6px 0;">評價：${g}</p><p style="font-size:12px;color:#ccc;">⏱${Math.ceil(timer)}s ⭐${styleScore} 🐾${knockCount}伏擊${goldenMouseGot?' 🐁':''}${isNew?' 🆕':''}</p>${best?`<p class="best">🏆 最高：${Math.max(best,styleScore)}分</p>`:''}<div class="btn" id="againBtn">再玩一次</div>`;winCV=$('winC');winCX=winCV.getContext('2d');wcBlink=0;wcBlinkT=0;wcNextBlink=700;wcEnterT=0;
+ct.innerHTML=`<canvas id="winC" width="180" height="150" style="display:block;margin:0 auto 4px;image-rendering:auto;"></canvas><h1>逃脫成功！</h1>${title?`<p class="title-tag">${title}</p>`:''}
+<p class="ending-line${!wasDetected&&knockCount===0?' secret':''}">
+${!wasDetected&&knockCount===0?'黑磯叼著金罐頭，消失在紅磚深巷。<br>保全們⸺ 連貓毛都沒看見。<br>天玉街，依然是黑磯的。':
+!wasDetected?'黑磯叼著罐頭，悄悄溜出店門。<br>深夜的紅磚深巷，一切如常。':
+'三罐全到手，鑰匙也順了。<br>今晚⸺ 吃得很飽。'}
+</p>
+<p style="font-size:18px;color:#f0c040;margin:6px 0;">評價：${g}</p>
+<p style="font-size:12px;color:#ccc;">⏱${Math.ceil(timer)}s ⭐${styleScore} 🐾${knockCount}伏擊${isNew?' 🆕':''}</p>
+${best?`<p class="best">🏆 最高：${Math.max(best,styleScore)}分</p>`:''}
+<div class="btn" id="againBtn">再來一晚</div>`;
+winCV=$('winC');winCX=winCV.getContext('2d');wcBlink=0;wcBlinkT=0;wcNextBlink=700;wcEnterT=0;
   // Play meow once, delayed slightly so win fanfare plays first
   if(!wcMeowed){wcMeowed=true;setTimeout(()=>{if(gs==='win')sfx.meow();},550);}
   $('againBtn').addEventListener('click',startGame);$('againBtn').addEventListener('touchend',e=>{e.preventDefault();startGame();});}}
 function startGame(){ia();initGame();pl.clawHeld=true;gs='playing';ovLastState=null;wcMeowed=false;$('ov').classList.add('hide');setTimeout(resize,100);}
-function loop(ts){const dt=Math.min(ts-lt,50);lt=ts;if(gs==='playing'){$('ov').classList.add('hide');update(dt);render();}else{if(gs==='title')drawEyes(dt);else render();showOv();if(gs==='win')drawWinCat(dt);}requestAnimationFrame(loop);}
+function drawFace(ctx,face){
+  ctx.clearRect(0,0,72,72);
+  // Background tint varies by character
+  const bgMap={kobayashi:'#1a2a1a',chen:'#1a1a2a',ahyong:'#2a1a0a',captain:'#1a0a1a',kurokichi:'#0a0a0a'};
+  ctx.fillStyle=bgMap[face]||'#1a1a1a';ctx.fillRect(0,0,72,72);
+  if(face==='kurokichi'){
+    // Black cat face, yellow eyes
+    ctx.fillStyle='#0a0a0a';ctx.fillRect(10,18,52,48);
+    ctx.fillStyle='#1a1a1a';ctx.fillRect(6,14,60,38);
+    // Ears
+    ctx.beginPath();ctx.moveTo(8,20);ctx.lineTo(18,4);ctx.lineTo(26,20);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(46,20);ctx.lineTo(54,4);ctx.lineTo(64,20);ctx.closePath();ctx.fill();
+    // Inner ears pink
+    ctx.fillStyle='#C44A6A';
+    ctx.beginPath();ctx.moveTo(14,18);ctx.lineTo(18,8);ctx.lineTo(22,18);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(50,18);ctx.lineTo(54,8);ctx.lineTo(58,18);ctx.closePath();ctx.fill();
+    // Yellow glowing eyes
+    const pu=0.75+0.25*Math.sin(Date.now()/220);
+    ctx.fillStyle=`rgba(255,220,40,${0.5*pu})`;
+    ctx.fillRect(16,28,16,16);ctx.fillRect(40,28,16,16);
+    ctx.fillStyle='#FFDD00';
+    ctx.fillRect(20,32,8,8);ctx.fillRect(44,32,8,8);
+    // Vertical slit pupils
+    ctx.fillStyle='#000';ctx.fillRect(23,32,2,8);ctx.fillRect(47,32,2,8);
+    // Catchlight
+    ctx.fillStyle='#FFF';ctx.fillRect(21,33,2,2);ctx.fillRect(45,33,2,2);
+    // Nose
+    ctx.fillStyle='#FF88AA';ctx.fillRect(32,48,8,4);
+    // Mouth
+    ctx.strokeStyle='#000';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(28,54);ctx.quadraticCurveTo(32,58,36,54);ctx.moveTo(36,54);ctx.quadraticCurveTo(40,58,44,54);ctx.stroke();
+  }else{
+    // Human guard face — varies by character
+    const dat={
+      kobayashi:{skin:'#e8c8a0',hat:'#2a6a1a',hatAcc:'#4a8a3a',expr:'nervous'},
+      chen:{skin:'#d8b890',hat:'#1a1a3a',hatAcc:'#3a3a6a',expr:'tired'},
+      ahyong:{skin:'#c8a880',hat:'#7a3a10',hatAcc:'#aa5a20',expr:'angry'},
+      captain:{skin:'#b89878',hat:'#5a1048',hatAcc:'#8a2070',expr:'stern'}
+    }[face];
+    if(!dat)return;
+    // Face (skin)
+    ctx.fillStyle=dat.skin;
+    ctx.fillRect(16,28,40,36);
+    // Neck/chin
+    ctx.fillStyle=dat.skin;ctx.fillRect(24,58,24,8);
+    // Hat (front visor)
+    ctx.fillStyle=dat.hat;ctx.fillRect(10,18,52,12);
+    ctx.fillRect(6,26,60,6);
+    // Hat accent band
+    ctx.fillStyle=dat.hatAcc;ctx.fillRect(10,24,52,2);
+    // Hat badge (gold star for captain, simple dot for rookie)
+    if(face==='captain'){
+      ctx.fillStyle='#FFD700';
+      ctx.fillRect(32,20,8,4);ctx.fillRect(34,18,4,2);ctx.fillRect(34,24,4,2);
+    }else if(face==='kobayashi'){
+      ctx.fillStyle='#FFFF88';ctx.fillRect(34,20,4,4);
+    }else{
+      ctx.fillStyle='#FFD700';ctx.fillRect(33,20,6,4);
+    }
+    // Eyes — expression-dependent
+    if(dat.expr==='nervous'){
+      // Wide circular eyes
+      ctx.fillStyle='#fff';ctx.fillRect(20,36,10,8);ctx.fillRect(42,36,10,8);
+      ctx.fillStyle='#000';ctx.fillRect(24,39,3,3);ctx.fillRect(46,39,3,3);
+      // Sweat drop
+      ctx.fillStyle='#88DDFF';ctx.fillRect(12,32,2,4);
+    }else if(dat.expr==='tired'){
+      // Half-closed eyes with eye bags
+      ctx.fillStyle='#fff';ctx.fillRect(20,38,10,4);ctx.fillRect(42,38,10,4);
+      ctx.fillStyle='#000';ctx.fillRect(24,39,3,2);ctx.fillRect(46,39,3,2);
+      // Eye bags
+      ctx.fillStyle='rgba(100,60,40,.5)';ctx.fillRect(20,43,10,2);ctx.fillRect(42,43,10,2);
+      // Cigarette
+      ctx.fillStyle='#fff';ctx.fillRect(36,56,8,2);
+      ctx.fillStyle='#f80';ctx.fillRect(44,56,2,2);
+    }else if(dat.expr==='angry'){
+      // Angry slanted eyebrows
+      ctx.fillStyle='#000';
+      ctx.fillRect(18,32,12,2);ctx.fillRect(20,34,10,1);
+      ctx.fillRect(42,32,12,2);ctx.fillRect(42,34,10,1);
+      // Eyes
+      ctx.fillStyle='#fff';ctx.fillRect(22,37,8,5);ctx.fillRect(42,37,8,5);
+      ctx.fillStyle='#000';ctx.fillRect(25,38,3,3);ctx.fillRect(45,38,3,3);
+      // Clenched teeth
+      ctx.fillStyle='#fff';ctx.fillRect(26,54,20,3);
+      ctx.fillStyle='#000';ctx.fillRect(28,54,1,3);ctx.fillRect(32,54,1,3);ctx.fillRect(36,54,1,3);ctx.fillRect(40,54,1,3);ctx.fillRect(44,54,1,3);
+    }else{ // stern
+      // Sharp narrow eyes
+      ctx.fillStyle='#000';ctx.fillRect(20,36,12,2);ctx.fillRect(40,36,12,2);
+      ctx.fillStyle='#fff';ctx.fillRect(22,38,8,4);ctx.fillRect(42,38,8,4);
+      ctx.fillStyle='#000';ctx.fillRect(26,39,2,3);ctx.fillRect(46,39,2,3);
+      // Mustache
+      ctx.fillStyle='#1a1a1a';ctx.fillRect(26,50,20,3);
+    }
+    // Mouth for non-angry/tired
+    if(dat.expr==='nervous'){
+      ctx.fillStyle='#000';ctx.fillRect(30,54,12,2);
+    }else if(dat.expr==='stern'){
+      ctx.fillStyle='#000';ctx.fillRect(28,56,16,2);
+    }
+  }
+}
+function loop(ts){const dt=Math.min(ts-lt,50);lt=ts;
+  if(gs==='playing'){$('ov').classList.add('hide');update(dt);render();}
+  else{updateBanner(dt);if(gs==='title')drawEyes(dt);else render();showOv();if(gs==='win')drawWinCat(dt);}
+  requestAnimationFrame(loop);}
 showOv();requestAnimationFrame(loop);
 </script>
 </body>
